@@ -1,5 +1,6 @@
 .DS_Store
 .cache
+.tmp
 npm-debug.log
 Thumbs.db
 node_modules/
@@ -23,3 +24,7 @@ product.overrides.json
 *.tsbuildinfo
 .vscode-test
 vscode-telemetry-docs/
+
+.kiro
+CLAUDE.md
+AGENTS.md

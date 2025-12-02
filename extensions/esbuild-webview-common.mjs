@@ -36,19 +36,22 @@ async function build(options, didBuild) {
 	await didBuild?.(options.outdir);
 }
 
-/**
- * Build the source code once using esbuild, logging errors instead of throwing.
- *
- * @param {BuildOptions} options
- * @param {(outDir: string) => unknown} [didBuild]
- */
-async function tryBuild(options, didBuild) {
-	try {
-		await build(options, didBuild);
-	} catch (err) {
-		console.error(err);
-	}
-}
+const buildDidBuildPlugin = (outdir, didBuild) => ({
+	name: 'did-build-callback',
+	setup(build) {
+		build.onEnd(async (result) => {
+			if (result.errors.length > 0 || !didBuild) {
+				return;
+			}
+
+			try {
+				await didBuild(outdir);
+			} catch (err) {
+				console.error(err);
+			}
+		});
+	},
+});
 
 /**
  * @param {{
@@ -81,9 +84,15 @@ export async function run(config, args, didBuild) {
 
 	const isWatch = args.indexOf('--watch') >= 0;
 	if (isWatch) {
-		await tryBuild(resolvedOptions, didBuild);
-		const watcher = await import('@parcel/watcher');
-		watcher.subscribe(config.srcDir, () => tryBuild(resolvedOptions, didBuild));
+		const plugins = resolvedOptions.plugins?.slice() ?? [];
+		if (didBuild) {
+			plugins.push(buildDidBuildPlugin(outdir, didBuild));
+		}
+		const ctx = await esbuild.context({
+			...resolvedOptions,
+			plugins,
+		});
+		await ctx.watch();
 	} else {
 		return build(resolvedOptions, didBuild).catch(() => process.exit(1));
 	}

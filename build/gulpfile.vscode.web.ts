@@ -2,6 +2,7 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+import { fileURLToPath } from 'url';
 
 import gulp from 'gulp';
 import * as path from 'path';
@@ -23,7 +24,10 @@ import VinylFile from 'vinyl';
 import jsonEditor from 'gulp-json-editor';
 import buildfile from './buildfile.ts';
 
-const REPO_ROOT = path.dirname(import.meta.dirname);
+
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined;
+const REPO_ROOT = path.dirname(__dirname);
 const BUILD_ROOT = path.dirname(REPO_ROOT);
 const WEB_FOLDER = path.join(REPO_ROOT, 'remote', 'web');
 
@@ -170,7 +174,7 @@ function packageTask(sourceFolderName: string, destinationFolderName: string) {
 
 		const deps = gulp.src(dependenciesSrc, { base: 'remote/web', dot: true })
 			.pipe(filter(['**', '!**/package-lock.json']))
-			.pipe(util.cleanNodeModules(path.join(import.meta.dirname, '.webignore')));
+			.pipe(util.cleanNodeModules(path.join(__dirname, '.webignore')));
 
 		const favicon = gulp.src('resources/server/favicon.ico', { base: 'resources/server' });
 		const manifest = gulp.src('resources/server/manifest.json', { base: 'resources/server' });

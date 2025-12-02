@@ -14,8 +14,11 @@ import fancyLog from 'fancy-log';
 import ansiColors from 'ansi-colors';
 import iconv from '@vscode/iconv-lite-umd';
 import { type l10nJsonFormat, getL10nXlf, type l10nJsonDetails, getL10nFilesFromXlf, getL10nJson } from '@vscode/l10n-dev';
+import { fileURLToPath } from 'url';
 
-const REPO_ROOT_PATH = path.join(import.meta.dirname, '../..');
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined;
+const REPO_ROOT_PATH = path.join(__dirname!, '../..');
 
 function log(message: any, ...rest: unknown[]): void {
 	fancyLog(ansiColors.green('[i18n]'), message, ...rest);

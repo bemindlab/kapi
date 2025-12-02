@@ -4,14 +4,17 @@
  *--------------------------------------------------------------------------------------------*/
 
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 import path from 'path';
 import url from 'url';
 import ansiColors from 'ansi-colors';
 import type { IExtensionDefinition } from './builtInExtensions.ts';
 
-const root = path.dirname(path.dirname(import.meta.dirname));
+const __dirname = import.meta.dirname || (import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined);
+
+const root = path.dirname(path.dirname(__dirname!));
 const rootCG = path.join(root, 'extensionsCG');
-const productjson = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '../../product.json'), 'utf8'));
+const productjson = JSON.parse(fs.readFileSync(path.join(__dirname!, '../../product.json'), 'utf8'));
 const builtInExtensions = productjson.builtInExtensions as IExtensionDefinition[] || [];
 const webBuiltInExtensions = productjson.webBuiltInExtensions as IExtensionDefinition[] || [];
 const token = process.env['GITHUB_TOKEN'];

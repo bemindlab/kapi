@@ -5,13 +5,17 @@
 
 // Can be removed once https://github.com/electron/electron-rebuild/pull/703 is available.
 
+import { fileURLToPath } from 'url';
 import fs from 'fs';
 import path from 'path';
 import debug from 'debug';
 import extract from 'extract-zip';
 import { downloadArtifact } from '@electron/get';
 
-const root = path.dirname(path.dirname(import.meta.dirname));
+
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined;
+const root = path.dirname(path.dirname(__dirname));
 
 const d = debug('libcxx-fetcher');
 

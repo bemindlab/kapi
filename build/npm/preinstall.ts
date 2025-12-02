@@ -6,7 +6,11 @@ import path from 'path';
 import * as fs from 'fs';
 import * as child_process from 'child_process';
 import * as os from 'os';
+import { fileURLToPath } from 'url';
 
+
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : process.cwd();
 if (!process.env['VSCODE_SKIP_NODE_VERSION_CHECK']) {
 	// Get the running Node.js version
 	const nodeVersion = /^(\d+)\.(\d+)\.(\d+)/.exec(process.versions.node);
@@ -15,7 +19,7 @@ if (!process.env['VSCODE_SKIP_NODE_VERSION_CHECK']) {
 	const patchNodeVersion = parseInt(nodeVersion![3]);
 
 	// Get the required Node.js version from .nvmrc
-	const nvmrcPath = path.join(import.meta.dirname, '..', '..', '.nvmrc');
+	const nvmrcPath = path.join(__dirname, '..', '..', '.nvmrc');
 	const requiredVersion = fs.readFileSync(nvmrcPath, 'utf8').trim();
 	const requiredVersionMatch = /^(\d+)\.(\d+)\.(\d+)/.exec(requiredVersion);
 
@@ -37,7 +41,13 @@ if (!process.env['VSCODE_SKIP_NODE_VERSION_CHECK']) {
 }
 
 if (process.env.npm_execpath?.includes('yarn')) {
-	console.error('\x1b[1;31m*** Seems like you are using `yarn` which is not supported in this repo any more, please use `npm i` instead. ***\x1b[0;0m');
+	console.error('\x1b[1;31m*** Seems like you are using `yarn` which is not supported in this repo, please use `pnpm install` instead. ***\x1b[0;0m');
+	throw new Error();
+}
+
+// Check if using npm instead of pnpm
+if (process.env.npm_execpath && !process.env.npm_execpath.includes('pnpm')) {
+	console.error('\x1b[1;31m*** This project uses pnpm. Please use `pnpm install` instead of `npm install`. ***\x1b[0;0m');
 	throw new Error();
 }
 
@@ -97,10 +107,10 @@ function hasSupportedVisualStudioVersion() {
 }
 
 function installHeaders() {
-	const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-	child_process.execSync(`${npm} ${process.env.npm_command || 'ci'}`, {
+	const pnpm = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
+	child_process.execSync(`${pnpm} ${process.env.npm_command || 'install'}`, {
 		env: process.env,
-		cwd: path.join(import.meta.dirname, 'gyp'),
+		cwd: path.join(__dirname, 'gyp'),
 		stdio: 'inherit'
 	});
 
@@ -108,11 +118,11 @@ function installHeaders() {
 	// file checked into our repository. So from that point it is safe to construct the path
 	// to that executable
 	const node_gyp = process.platform === 'win32'
-		? path.join(import.meta.dirname, 'gyp', 'node_modules', '.bin', 'node-gyp.cmd')
-		: path.join(import.meta.dirname, 'gyp', 'node_modules', '.bin', 'node-gyp');
+		? path.join(__dirname, 'gyp', 'node_modules', '.bin', 'node-gyp.cmd')
+		: path.join(__dirname, 'gyp', 'node_modules', '.bin', 'node-gyp');
 
-	const local = getHeaderInfo(path.join(import.meta.dirname, '..', '..', '.npmrc'));
-	const remote = getHeaderInfo(path.join(import.meta.dirname, '..', '..', 'remote', '.npmrc'));
+	const local = getHeaderInfo(path.join(__dirname, '..', '..', '.npmrc'));
+	const remote = getHeaderInfo(path.join(__dirname, '..', '..', 'remote', '.npmrc'));
 
 	if (local !== undefined) {
 		// Both disturl and target come from a file checked into our repository
@@ -135,7 +145,7 @@ function installHeaders() {
 		if (fs.existsSync(localHeaderPath)) {
 			console.log('Applying v8-source-location.patch to', localHeaderPath);
 			try {
-				child_process.execFileSync('patch', ['-p0', '-i', path.join(import.meta.dirname, 'gyp', 'custom-headers', 'v8-source-location.patch')], {
+				child_process.execFileSync('patch', ['-p0', '-i', path.join(__dirname, 'gyp', 'custom-headers', 'v8-source-location.patch')], {
 					cwd: localHeaderPath
 				});
 			} catch (error) {

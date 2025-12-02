@@ -6,7 +6,10 @@
 import fs from 'fs';
 import path from 'path';
 import cp from 'child_process';
-const root = fs.realpathSync(path.dirname(path.dirname(import.meta.dirname)));
+import { fileURLToPath } from 'url';
+
+const __dirname = import.meta.dirname || (import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined);
+const root = fs.realpathSync(path.dirname(path.dirname(__dirname!)));
 
 function getNpmProductionDependencies(folder: string): string[] {
 	let raw: string;

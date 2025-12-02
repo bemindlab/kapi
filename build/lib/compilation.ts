@@ -7,6 +7,7 @@ import es from 'event-stream';
 import fs from 'fs';
 import gulp from 'gulp';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import * as monacodts from './monaco-api.ts';
 import * as nls from './nls.ts';
 import { createReporter } from './reporter.ts';
@@ -30,7 +31,7 @@ import sourcemaps from 'gulp-sourcemaps';
 const reporter = createReporter();
 
 function getTypeScriptCompilerOptions(src: string): ts.CompilerOptions {
-	const rootDir = path.join(import.meta.dirname, `../../${src}`);
+	const rootDir = path.join(__dirname!, `../../${src}`);
 	const options: ts.CompilerOptions = {};
 	options.verbose = false;
 	options.sourceMap = true;
@@ -40,7 +41,8 @@ function getTypeScriptCompilerOptions(src: string): ts.CompilerOptions {
 	options.rootDir = rootDir;
 	options.baseUrl = rootDir;
 	options.sourceRoot = util.toFileUri(rootDir);
-	options.newLine = /\r\n/.test(fs.readFileSync(import.meta.filename, 'utf8')) ? 0 : 1;
+	const moduleFilePath = import.meta.filename ?? fileURLToPath(import.meta.url);
+	options.newLine = /\r\n/.test(fs.readFileSync(moduleFilePath, 'utf8')) ? 0 : 1;
 	return options;
 }
 
@@ -52,7 +54,7 @@ interface ICompileTaskOptions {
 }
 
 export function createCompile(src: string, { build, emitError, transpileOnly, preserveEnglish }: ICompileTaskOptions) {
-	const projectPath = path.join(import.meta.dirname, '../../', src, 'tsconfig.json');
+	const projectPath = path.join(__dirname!, '../../', src, 'tsconfig.json');
 	const overrideOptions = { ...getTypeScriptCompilerOptions(src), inlineSources: Boolean(build) };
 	if (!build) {
 		overrideOptions.inlineSourceMap = true;
@@ -183,7 +185,8 @@ export function watchTask(out: string, build: boolean, srcPath: string = 'src'):
 	return task;
 }
 
-const REPO_SRC_FOLDER = path.join(import.meta.dirname, '../../src');
+const __dirname = import.meta.dirname || (import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined);
+const REPO_SRC_FOLDER = path.join(__dirname!, '../../src');
 
 class MonacoGenerator {
 	private readonly _isWatch: boolean;

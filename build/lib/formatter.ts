@@ -2,11 +2,15 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+import { fileURLToPath } from 'url';
 import fs from 'fs';
 import path from 'path';
 import ts from 'typescript';
 
 
+
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined;
 class LanguageServiceHost implements ts.LanguageServiceHost {
 	files: ts.MapLike<ts.IScriptSnapshot> = {};
 	addFile(fileName: string, text: string) {
@@ -59,7 +63,7 @@ const defaults: ts.FormatCodeSettings = {
 const getOverrides = (() => {
 	let value: ts.FormatCodeSettings | undefined;
 	return () => {
-		value ??= JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '..', '..', 'tsfmt.json'), 'utf8'));
+		value ??= JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'tsfmt.json'), 'utf8'));
 		return value;
 	};
 })();

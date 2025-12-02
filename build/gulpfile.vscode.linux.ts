@@ -2,6 +2,7 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+import { fileURLToPath } from 'url';
 
 import gulp from 'gulp';
 import replace from 'gulp-replace';
@@ -19,8 +20,11 @@ import * as path from 'path';
 import * as cp from 'child_process';
 import { promisify } from 'util';
 
+
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined;
 const exec = promisify(cp.exec);
-const root = path.dirname(import.meta.dirname);
+const root = path.dirname(__dirname);
 const commit = getVersion(root);
 
 const linuxPackageRevision = Math.floor(new Date().getTime() / 1000);

@@ -3,12 +3,16 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
 import minimatch from 'minimatch';
 import { makeUniversalApp } from 'vscode-universal-bundler';
 
-const root = path.dirname(path.dirname(import.meta.dirname));
+
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined;
+const root = path.dirname(path.dirname(__dirname));
 
 async function main(buildDir?: string) {
 	const arch = process.env['VSCODE_ARCH'];

@@ -5,7 +5,7 @@
 //@ts-check
 
 import path from 'path';
-import fse from 'fs-extra';
+import fs from 'fs';
 import { run } from '../esbuild-webview-common.mjs';
 
 const args = process.argv.slice(2);
@@ -14,18 +14,18 @@ const srcDir = path.join(import.meta.dirname, 'notebook');
 const outDir = path.join(import.meta.dirname, 'notebook-out');
 
 function postBuild(outDir) {
-	fse.copySync(
+	fs.copyFileSync(
 		path.join(import.meta.dirname, 'node_modules', 'katex', 'dist', 'katex.min.css'),
 		path.join(outDir, 'katex.min.css'));
 
 	const fontsDir = path.join(import.meta.dirname, 'node_modules', 'katex', 'dist', 'fonts');
 	const fontsOutDir = path.join(outDir, 'fonts/');
 
-	fse.mkdirSync(fontsOutDir, { recursive: true });
+	fs.mkdirSync(fontsOutDir, { recursive: true });
 
-	for (const file of fse.readdirSync(fontsDir)) {
+	for (const file of fs.readdirSync(fontsDir)) {
 		if (file.endsWith('.woff2')) {
-			fse.copyFileSync(path.join(fontsDir, file), path.join(fontsOutDir, file));
+			fs.copyFileSync(path.join(fontsDir, file), path.join(fontsOutDir, file));
 		}
 	}
 }

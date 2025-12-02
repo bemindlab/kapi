@@ -1,0 +1,10 @@
+disturl="https://electronjs.org/headers"
+target="39.2.3"
+ms_build_id="12857560"
+runtime="electron"
+build_from_source="true"
+timeout=180000
+
+# pnpm specific settings
+shamefully-hoist=true
+strict-peer-dependencies=false

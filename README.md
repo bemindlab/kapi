@@ -150,12 +150,16 @@ Each feature line maps back to existing directories (`extensions`, `.kiro`, `src
 
 ## Architecture
 
-KAPI AI Agents is built on the VS Code architecture with additional AI automation layers:
+KAPI AI Agents reuses the VS Code architecture while layering in the agent orchestration, branding, and tooling work needed to run the lightweight editor.
 
-* `src/` - Core editor and AI agent framework (TypeScript)
-* `extensions/` - Built-in extensions with AI enhancements
-* `.kiro/` - AI agent configurations and steering rules
-* `cli/` - Command-line interface with AI automation support
+* `src/` – Core editor runtime and AI agent framework (TypeScript/ESM). The `src/vs` tree mirrors the original workbench/platform/services layout so patches stay aligned with upstream VS Code.
+  * `src/kapi/` contains the main KAPI-specific development files, agent integrations, and customization hooks used to build the lightweight, AI-enhanced workbench.
+* `extensions/` – Built-in extensions (with their own `src`, `test`, and `pnpm-lock.yaml`) that each plug into the agent-powered workflow.
+* `.kiro/` – AI task plans, policies, and behavior steering rules that tell the multi-agent system how to approach problems.
+* `cli/` – Command-line tooling for launching agent workflows, CLI servers, and automation assistants.
+* `build/` – Gulp-based build/watch scripts, packaging logic (electron bundle, distros), and helper utilities (like the new `ensureElectron` helper).
+
+We now provide `make dev` to run the lightweight development loop: it rebuilds native addons (e.g., `@vscode/policy-watcher`), starts `pnpm run watch-client`, ensures the Electron runtime is ready via `pnpm run gulp electron`, and finally launches `./scripts/code.sh`, keeping the watcher alive until you close the app. This mirrors the upstream VS Code flow while adding the agent-oriented flavor of KAPI.
 
 ## License
 

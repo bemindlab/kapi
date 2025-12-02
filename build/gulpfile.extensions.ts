@@ -5,10 +5,13 @@
 
 // Increase max listeners for event emitters
 import { EventEmitter } from 'events';
-EventEmitter.defaultMaxListeners = 100;
-
+import { fileURLToPath } from 'url';
 import gulp from 'gulp';
 import * as path from 'path';
+
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined;
+EventEmitter.defaultMaxListeners = 100;
 import * as nodeUtil from 'util';
 import es from 'event-stream';
 import filter from 'gulp-filter';
@@ -23,7 +26,7 @@ import * as ext from './lib/extensions.ts';
 import * as tsb from './lib/tsb/index.ts';
 import sourcemaps from 'gulp-sourcemaps';
 
-const root = path.dirname(import.meta.dirname);
+const root = path.dirname(__dirname);
 const commit = getVersion(root);
 
 // To save 250ms for each gulp startup, we are caching the result here

@@ -2,18 +2,22 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+import { fileURLToPath } from 'url';
 import { EventEmitter } from 'events';
 import glob from 'glob';
 import gulp from 'gulp';
+import path from 'path';
 import { createRequire } from 'node:module';
 import { monacoTypecheckTask /* , monacoTypecheckWatchTask */ } from './gulpfile.editor.ts';
 import { compileExtensionMediaTask, compileExtensionsTask, watchExtensionsTask } from './gulpfile.extensions.ts';
+import { ensureElectron } from './lib/electron.ts';
 import * as compilation from './lib/compilation.ts';
 import * as task from './lib/task.ts';
 import * as util from './lib/util.ts';
 
 EventEmitter.defaultMaxListeners = 100;
 
+const __dirname = import.meta.dirname || (import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined);
 const require = createRequire(import.meta.url);
 
 const { transpileTask, compileTask, watchTask, compileApiProposalNamesTask, watchApiProposalNamesTask } = compilation;
@@ -46,13 +50,16 @@ gulp.task(task.define('watch', task.parallel(/* monacoTypecheckWatchTask, */ wat
 // Default
 gulp.task('default', _compileTask);
 
+const electronTask = task.define('electron', async () => ensureElectron());
+gulp.task(electronTask);
+
 process.on('unhandledRejection', (reason, p) => {
 	console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
 	process.exit(1);
 });
 
 // Load all the gulpfiles only if running tasks other than the editor tasks
-glob.sync('gulpfile.*.ts', { cwd: import.meta.dirname })
+glob.sync('gulpfile.*.ts', { cwd: __dirname! })
 	.forEach(f => {
 		return require(`./${f}`);
 	});

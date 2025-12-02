@@ -5,6 +5,7 @@
 
 import gulp from 'gulp';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import * as util from './lib/util.ts';
 import { getVersion } from './lib/getVersion.ts';
 import * as task from './lib/task.ts';
@@ -20,7 +21,8 @@ import filter from 'gulp-filter';
 import { createReporter } from './lib/reporter.ts';
 import monacoPackage from './monaco/package.json' with { type: 'json' };
 
-const root = path.dirname(import.meta.dirname);
+const __dirname = import.meta.dirname || (import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined);
+const root = path.dirname(__dirname!);
 const sha1 = getVersion(root);
 const semver = monacoPackage.version;
 const headerVersion = semver + '(' + sha1 + ')';
@@ -233,7 +235,7 @@ function createTscCompileTask(watch: boolean) {
 				args.push('-w');
 			}
 			const child = cp.spawn(`node`, args, {
-				cwd: path.join(import.meta.dirname, '..'),
+				cwd: path.join(__dirname!, '..'),
 				// stdio: [null, 'pipe', 'inherit']
 			});
 			const errors: string[] = [];

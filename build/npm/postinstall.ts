@@ -7,10 +7,14 @@ import * as fs from 'fs';
 import path from 'path';
 import * as os from 'os';
 import * as child_process from 'child_process';
+import { fileURLToPath } from 'url';
 import { dirs } from './dirs.ts';
 
-const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-const root = path.dirname(path.dirname(import.meta.dirname));
+
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : process.cwd();
+const pnpm = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
+const root = path.dirname(path.dirname(__dirname));
 
 function log(dir: string, message: string) {
 	if (process.stdout.isTTY) {
@@ -58,22 +62,24 @@ function npmInstall(dir: string, opts?: child_process.SpawnSyncOptions) {
 			'-e', 'GITHUB_TOKEN',
 			'-v', `${process.env['VSCODE_HOST_MOUNT']}:/root/vscode`,
 			'-v', `${process.env['VSCODE_HOST_MOUNT']}/.build/.netrc:/root/.netrc`,
-			'-v', `${process.env['VSCODE_NPMRC_PATH']}:/root/.npmrc`,
+			'-v', `${process.env['VSCODE_NPMRC_PATH']}:/root/.pnpmrc`,
 			'-w', path.resolve('/root/vscode', dir),
 			process.env['VSCODE_REMOTE_DEPENDENCIES_CONTAINER_NAME'],
-			'sh', '-c', `\"chown -R root:root ${path.resolve('/root/vscode', dir)} && export PATH="/root/vscode/.build/nodejs-musl/usr/local/bin:$PATH" && npm i -g node-gyp-build && npm ci\"`
+			'sh', '-c', `\"chown -R root:root ${path.resolve('/root/vscode', dir)} && export PATH="/root/vscode/.build/nodejs-musl/usr/local/bin:$PATH" && pnpm add -g node-gyp-build && pnpm install\"`
 		], opts);
 		run('sudo', ['chown', '-R', `${userinfo.uid}:${userinfo.gid}`, `${path.resolve(root, dir)}`], opts);
 	} else {
 		log(dir, 'Installing dependencies...');
-		run(npm, command.split(' '), opts);
+		run(pnpm, command.split(' '), opts);
 	}
 	removeParcelWatcherPrebuild(dir);
 }
 
 function setNpmrcConfig(dir: string, env: NodeJS.ProcessEnv) {
+	const pnpmrcPath = path.join(root, dir, '.pnpmrc');
 	const npmrcPath = path.join(root, dir, '.npmrc');
-	const lines = fs.readFileSync(npmrcPath, 'utf8').split('\n');
+	const configPath = fs.existsSync(pnpmrcPath) ? pnpmrcPath : npmrcPath;
+	const lines = fs.readFileSync(configPath, 'utf8').split('\n');
 
 	for (const line of lines) {
 		const trimmedLine = line.trim();
@@ -86,8 +92,8 @@ function setNpmrcConfig(dir: string, env: NodeJS.ProcessEnv) {
 	// Use our bundled node-gyp version
 	env['npm_config_node_gyp'] =
 		process.platform === 'win32'
-			? path.join(import.meta.dirname, 'gyp', 'node_modules', '.bin', 'node-gyp.cmd')
-			: path.join(import.meta.dirname, 'gyp', 'node_modules', '.bin', 'node-gyp');
+			? path.join(__dirname, 'gyp', 'node_modules', '.bin', 'node-gyp.cmd')
+			: path.join(__dirname, 'gyp', 'node_modules', '.bin', 'node-gyp');
 
 	// Force node-gyp to use process.config on macOS
 	// which defines clang variable as expected. Otherwise we

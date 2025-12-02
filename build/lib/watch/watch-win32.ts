@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { fileURLToPath } from 'url';
 import path from 'path';
 import cp from 'child_process';
 import fs from 'fs';
@@ -11,7 +12,10 @@ import es from 'event-stream';
 import filter from 'gulp-filter';
 import { Stream } from 'stream';
 
-const watcherPath = path.join(import.meta.dirname, 'watcher.exe');
+
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined;
+const watcherPath = path.join(__dirname, 'watcher.exe');
 
 function toChangeType(type: '0' | '1' | '2'): 'change' | 'add' | 'unlink' {
 	switch (type) {

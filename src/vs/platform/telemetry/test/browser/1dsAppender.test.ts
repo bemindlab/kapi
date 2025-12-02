@@ -18,6 +18,14 @@ class AppInsightsCoreMock implements IAppInsightsCore {
 		this.events.push(event.baseData);
 	}
 
+	public initialize(_config: unknown, _extensions: unknown[]): void {
+		// No-op
+	}
+
+	public addTelemetryInitializer(_initializer: (envelope: Record<string, unknown>) => void): void {
+		// No-op
+	}
+
 	public unload(isAsync: boolean, unloadComplete: (unloadState: ITelemetryUnloadState) => void): void {
 		// No-op
 	}

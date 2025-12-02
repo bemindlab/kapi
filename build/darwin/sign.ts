@@ -3,13 +3,17 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { fileURLToPath } from 'url';
 import fs from 'fs';
 import path from 'path';
 import { sign, type SignOptions } from '@electron/osx-sign';
 import { spawn } from '@malept/cross-spawn-promise';
 
-const root = path.dirname(path.dirname(import.meta.dirname));
-const baseDir = path.dirname(import.meta.dirname);
+
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined;
+const root = path.dirname(path.dirname(__dirname));
+const baseDir = path.dirname(__dirname);
 const product = JSON.parse(fs.readFileSync(path.join(root, 'product.json'), 'utf8'));
 const helperAppBaseName = product.nameShort;
 const gpuHelperAppName = helperAppBaseName + ' Helper (GPU).app';

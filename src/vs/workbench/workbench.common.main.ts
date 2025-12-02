@@ -178,6 +178,11 @@ registerSingleton(IWebWorkerService, WebWorkerService, InstantiationType.Delayed
 registerSingleton(IMcpGalleryService, McpGalleryService, InstantiationType.Delayed);
 registerSingleton(IAllowedMcpServersService, AllowedMcpServersService, InstantiationType.Delayed);
 
+// Lightweight Mode
+import { ILightweightModeService } from './services/lightweightMode/common/lightweightMode.js';
+import { LightweightModeService } from './services/lightweightMode/browser/lightweightModeService.js';
+registerSingleton(ILightweightModeService, LightweightModeService, InstantiationType.Delayed);
+
 //#endregion
 
 
@@ -196,6 +201,9 @@ import './contrib/preferences/browser/preferencesSearch.js';
 
 // Performance
 import './contrib/performance/browser/performance.contribution.js';
+
+// Lightweight Mode
+import './contrib/lightweightMode/browser/lightweightMode.contribution.js';
 
 // Notebook
 import './contrib/notebook/browser/notebook.contribution.js';

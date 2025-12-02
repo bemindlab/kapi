@@ -4,9 +4,12 @@
  *--------------------------------------------------------------------------------------------*/
 
 import path from 'path';
+import { fileURLToPath } from 'url';
 import fs from 'fs';
 
-const root = path.dirname(path.dirname(import.meta.dirname));
+const __dirname = import.meta.dirname || (import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined);
+
+const root = path.dirname(path.dirname(__dirname!));
 const npmrcPath = path.join(root, 'remote', '.npmrc');
 const npmrc = fs.readFileSync(npmrcPath, 'utf8');
 const version = /^target="(.*)"$/m.exec(npmrc)?.[1];

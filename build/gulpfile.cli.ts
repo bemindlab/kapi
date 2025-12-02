@@ -2,6 +2,7 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+import { fileURLToPath } from 'url';
 
 import es from 'event-stream';
 import gulp from 'gulp';
@@ -18,8 +19,11 @@ import { createReporter } from './lib/reporter.ts';
 import untar from 'gulp-untar';
 import gunzip from 'gulp-gunzip';
 
+
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined;
 const root = 'cli';
-const rootAbs = path.resolve(import.meta.dirname, '..', root);
+const rootAbs = path.resolve(__dirname, '..', root);
 const src = `${root}/src`;
 
 const platformOpensslDirName =

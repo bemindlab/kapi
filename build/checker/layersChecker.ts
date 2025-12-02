@@ -2,6 +2,7 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+import { fileURLToPath } from 'url';
 
 import ts from 'typescript';
 import { readFileSync, existsSync } from 'fs';
@@ -23,6 +24,9 @@ import minimatch from 'minimatch';
 
 // Types that are defined in a common layer but are known to be only
 // available in native environments should not be allowed in browser
+
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined;
 const NATIVE_TYPES = [
 	'NativeParsedArgs',
 	'INativeEnvironmentService',
@@ -88,7 +92,7 @@ const RULES: IRule[] = [
 	}
 ];
 
-const TS_CONFIG_PATH = join(import.meta.dirname, '../../', 'src', 'tsconfig.json');
+const TS_CONFIG_PATH = join(__dirname, '../../', 'src', 'tsconfig.json');
 
 interface IRule {
 	target: string;

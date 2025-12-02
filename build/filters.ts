@@ -4,7 +4,10 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { readFileSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = import.meta.dirname || (import.meta.url ? dirname(fileURLToPath(import.meta.url)) : undefined);
 
 /**
  * Hygiene works by creating cascading subsets of all our files and
@@ -217,7 +220,7 @@ export const eslintFilter = Object.freeze<string[]>([
 	'**/*.mjs',
 	'**/*.ts',
 	'.eslint-plugin-local/**/*.ts',
-	...readFileSync(join(import.meta.dirname, '..', '.eslint-ignore'))
+	...readFileSync(join(__dirname!, '..', '.eslint-ignore'))
 		.toString()
 		.split(/\r\n|\n/)
 		.filter(line => line && !line.startsWith('#'))

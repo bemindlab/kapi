@@ -11,10 +11,17 @@ import { mixin } from '../../../base/common/objects.js';
 import { isWeb } from '../../../base/common/platform.js';
 import { ITelemetryAppender, validateTelemetryData } from './telemetryUtils.js';
 
+interface OneDsExtendedConfiguration extends IExtendedConfiguration, Record<string, unknown> {
+	instrumentationKey?: string;
+	extensionConfig?: Record<string, IChannelConfiguration>;
+}
+
 // Interface type which is a subset of @microsoft/1ds-core-js AppInsightsCore.
 // Allows us to more easily build mock objects for testing as the interface is quite large and we only need a few properties.
 export interface IAppInsightsCore {
 	pluginVersionString: string;
+	initialize(config: OneDsExtendedConfiguration, extensions: unknown[], logger?: unknown, notificationManager?: unknown): void;
+	addTelemetryInitializer(initializer: (envelope: Record<string, unknown>) => void): void;
 	track(item: ITelemetryItem | IExtendedTelemetryItem): void;
 	unload(isAsync: boolean, unloadComplete: (unloadState: ITelemetryUnloadState) => void): void;
 }
@@ -28,10 +35,10 @@ async function getClient(instrumentationKey: string, addInternalFlag?: boolean, 
 	// eslint-disable-next-line local/code-amd-node-module
 	const postPlugin = isWeb ? await importAMDNodeModule<typeof import('@microsoft/1ds-post-js')>('@microsoft/1ds-post-js', 'bundle/ms.post.min.js') : await import('@microsoft/1ds-post-js');
 
-	const appInsightsCore = new oneDs.AppInsightsCore();
+	const appInsightsCore = new oneDs.AppInsightsCore() as unknown as IAppInsightsCore;
 	const collectorChannelPlugin: PostChannel = new postPlugin.PostChannel();
 	// Configure the app insights core to send to collector++ and disable logging of debug info
-	const coreConfig: IExtendedConfiguration = {
+	const coreConfig: OneDsExtendedConfiguration = {
 		instrumentationKey,
 		endpointUrl,
 		loggingLevelTelemetry: 0,
@@ -45,7 +52,7 @@ async function getClient(instrumentationKey: string, addInternalFlag?: boolean, 
 	};
 
 	if (xhrOverride) {
-		coreConfig.extensionConfig = {};
+		coreConfig.extensionConfig ??= {};
 		// Configure the channel to use a XHR Request override since it's not available in node
 		const channelConfig: IChannelConfiguration = {
 			alwaysUseXhrOverride: true,
@@ -57,7 +64,7 @@ async function getClient(instrumentationKey: string, addInternalFlag?: boolean, 
 
 	appInsightsCore.initialize(coreConfig, []);
 
-	appInsightsCore.addTelemetryInitializer((envelope) => {
+	appInsightsCore.addTelemetryInitializer((envelope: Record<string, any>) => {
 		// Opt the user out of 1DS data sharing
 		envelope['ext'] = envelope['ext'] ?? {};
 		envelope['ext']['web'] = envelope['ext']['web'] ?? {};

@@ -3,11 +3,15 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { fileURLToPath } from 'url';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const sourceFile = path.join(import.meta.dirname, '../../../src/vs/workbench/contrib/policyExport/common/policyDto.ts');
-const destFile = path.join(import.meta.dirname, 'policyDto.ts');
+
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined;
+const sourceFile = path.join(__dirname, '../../../src/vs/workbench/contrib/policyExport/common/policyDto.ts');
+const destFile = path.join(__dirname, 'policyDto.ts');
 
 try {
 	// Check if source file exists

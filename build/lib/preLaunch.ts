@@ -2,12 +2,16 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+import { fileURLToPath } from 'url';
 import path from 'path';
 import { spawn } from 'child_process';
 import { promises as fs } from 'fs';
 
+
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined;
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-const rootDir = path.resolve(import.meta.dirname, '..', '..');
+const rootDir = path.resolve(__dirname, '..', '..');
 
 function runProcess(command: string, args: ReadonlyArray<string> = []) {
 	return new Promise<void>((resolve, reject) => {

@@ -2,11 +2,15 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 import { join, resolve } from 'path';
 import { existsSync, rmSync } from 'fs';
 
-const rootPath = resolve(import.meta.dirname, '..', '..');
+
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined;
+const rootPath = resolve(__dirname, '..', '..');
 const telemetryDocsPath = join(rootPath, 'vscode-telemetry-docs');
 const repoUrl = 'https://github.com/microsoft/vscode-telemetry-docs';
 

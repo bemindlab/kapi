@@ -3,15 +3,19 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { fileURLToPath } from 'url';
 import { readFileSync } from 'fs';
 import path from 'path';
 
+
+// Polyfill for __dirname (Node.js v22+ feature)
+const __dirname = import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined;
 const RE_VAR_PROP = /var\(\s*(--([\w\-\.]+))/g;
 
 let knownVariables: Set<string> | undefined;
 function getKnownVariableNames() {
 	if (!knownVariables) {
-		const knownVariablesFileContent = readFileSync(path.join(import.meta.dirname, './vscode-known-variables.json'), 'utf8').toString();
+		const knownVariablesFileContent = readFileSync(path.join(__dirname, './vscode-known-variables.json'), 'utf8').toString();
 		const knownVariablesInfo = JSON.parse(knownVariablesFileContent);
 		knownVariables = new Set([...knownVariablesInfo.colors, ...knownVariablesInfo.others] as string[]);
 	}

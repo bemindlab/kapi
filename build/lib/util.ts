@@ -13,10 +13,12 @@ import _rimraf from 'rimraf';
 import VinylFile from 'vinyl';
 import through from 'through';
 import sm from 'source-map';
-import { pathToFileURL } from 'url';
+import { pathToFileURL, fileURLToPath } from 'url';
 import ternaryStream from 'ternary-stream';
 
-const root = path.dirname(path.dirname(import.meta.dirname));
+// Polyfill for import.meta.dirname (Node.js v22+ feature)
+const __dirname = import.meta.dirname || (import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : __dirname);
+const root = path.dirname(path.dirname(__dirname));
 
 export interface ICancellationToken {
 	isCancellationRequested(): boolean;
@@ -225,12 +227,27 @@ export function loadSourcemaps(): NodeJS.ReadWriteStream {
 				return;
 			}
 
-			f.contents = Buffer.from(contents.replace(/\/\/# sourceMappingURL=(.*)$/g, ''), 'utf8');
+			const strippedContents = contents.replace(/\/\/# sourceMappingURL=(.*)$/g, '');
+			f.contents = Buffer.from(strippedContents, 'utf8');
 
-			fs.readFile(path.join(path.dirname(f.path), lastMatch[1]), 'utf8', (err, contents) => {
-				if (err) { return cb(err); }
+			const mapPath = path.join(path.dirname(f.path), lastMatch[1]);
+			fs.readFile(mapPath, 'utf8', (err, mapContents) => {
+				if (err) {
+					if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+						f.sourceMap = {
+							version: '3',
+							names: [],
+							mappings: '',
+							sources: [f.relative.replace(/\\/g, '/')],
+							sourcesContent: [strippedContents]
+						};
+						return cb(undefined, f);
+					}
 
-				f.sourceMap = JSON.parse(contents);
+					return cb(err);
+				}
+
+				f.sourceMap = JSON.parse(mapContents);
 				cb(undefined, f);
 			});
 		}));

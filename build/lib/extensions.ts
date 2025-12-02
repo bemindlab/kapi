@@ -26,11 +26,13 @@ import { type IExtensionDefinition, getExtensionStream } from './builtInExtensio
 import { getVersion } from './getVersion.ts';
 import { fetchUrls, fetchGithub } from './fetch.ts';
 import vzip from 'gulp-vinyl-zip';
-
+import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
+
+const __dirname = import.meta.dirname || (import.meta.url ? path.dirname(fileURLToPath(import.meta.url)) : undefined);
 const require = createRequire(import.meta.url);
 
-const root = path.dirname(path.dirname(import.meta.dirname));
+const root = path.dirname(path.dirname(__dirname!));
 const commit = getVersion(root);
 const sourceMappingURLBase = `https://main.vscode-cdn.net/sourcemaps/${commit}`;
 
@@ -335,7 +337,7 @@ const marketplaceWebExtensionsExclude = new Set([
 	'ms-vscode.vscode-js-profile-table'
 ]);
 
-const productJson = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, '../../product.json'), 'utf8'));
+const productJson = JSON.parse(fs.readFileSync(path.join(__dirname!, '../../product.json'), 'utf8'));
 const builtInExtensions: IExtensionDefinition[] = productJson.builtInExtensions || [];
 const webBuiltInExtensions: IExtensionDefinition[] = productJson.webBuiltInExtensions || [];
 
