@@ -6,7 +6,7 @@
 import { Emitter } from '../../../../base/common/event.js';
 import { TernarySearchTree } from '../../../../base/common/ternarySearchTree.js';
 import { URI } from '../../../../base/common/uri.js';
-import { getConfigurationValue, IConfigurationChangeEvent, IConfigurationOverrides, IConfigurationService, IConfigurationValue, isConfigurationOverrides } from '../../common/configuration.js';
+import { ConfigurationTarget, getConfigurationValue, IConfigurationChangeEvent, IConfigurationOverrides, IConfigurationService, IConfigurationValue, isConfigurationOverrides } from '../../common/configuration.js';
 import { Extensions, IConfigurationRegistry } from '../../common/configurationRegistry.js';
 import { Registry } from '../../../registry/common/platform.js';
 
@@ -47,13 +47,37 @@ export class TestConfigurationService implements IConfigurationService {
 	}
 
 	public setUserConfiguration(key: string, value: unknown, root?: URI): Promise<void> {
+		// Store keys that changed for the event
+		const changedKeys = new Set<string>();
+
 		if (root) {
 			const configForRoot = this.configurationByRoot.get(root.fsPath) || Object.create(null);
 			configForRoot[key] = value;
 			this.configurationByRoot.set(root.fsPath, configForRoot);
+			changedKeys.add(key);
 		} else {
 			this.configuration[key] = value;
+			changedKeys.add(key);
 		}
+
+		// Fire configuration change event
+		this.onDidChangeConfigurationEmitter.fire({
+			affectsConfiguration: (configuration: string, overrides?: IConfigurationOverrides): boolean => {
+				// Check if this configuration key or any parent key changed
+				for (const changedKey of changedKeys) {
+					if (configuration === changedKey || configuration.startsWith(changedKey + '.')) {
+						return true;
+					}
+				}
+				return false;
+			},
+			source: ConfigurationTarget.USER,
+			affectedKeys: changedKeys as ReadonlySet<string>,
+			change: {
+				keys: Array.from(changedKeys),
+				overrides: []
+			}
+		});
 
 		return Promise.resolve(undefined);
 	}

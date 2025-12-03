@@ -7,6 +7,7 @@ import { Disposable } from '../../../../base/common/lifecycle.js';
 import { IWorkbenchContribution } from '../../../common/contributions.js';
 import { ILightweightModeService } from '../../../services/lightweightMode/common/lightweightMode.js';
 import { IWorkbenchLayoutService, Parts } from '../../../services/layout/browser/layoutService.js';
+import { IConfigurationService } from '../../../../platform/configuration/common/configuration.js';
 
 export class LightweightModeLayoutContribution extends Disposable implements IWorkbenchContribution {
 
@@ -16,7 +17,8 @@ export class LightweightModeLayoutContribution extends Disposable implements IWo
 
 	constructor(
 		@ILightweightModeService private readonly lightweightModeService: ILightweightModeService,
-		@IWorkbenchLayoutService private readonly layoutService: IWorkbenchLayoutService
+		@IWorkbenchLayoutService private readonly layoutService: IWorkbenchLayoutService,
+		@IConfigurationService private readonly configurationService: IConfigurationService
 	) {
 		super();
 
@@ -31,6 +33,16 @@ export class LightweightModeLayoutContribution extends Disposable implements IWo
 				this.applyLightweightMode();
 			} else {
 				this.restoreNormalMode();
+			}
+		}));
+
+		// Listen for configuration changes while mode is active
+		this._register(this.configurationService.onDidChangeConfiguration(e => {
+			// Only react if lightweight mode is enabled and relevant settings changed
+			if (this.lightweightModeService.isEnabled() &&
+				e.affectsConfiguration('workbench.lightweightMode')) {
+				// Re-apply settings with new configuration
+				this.applyLightweightMode();
 			}
 		}));
 	}

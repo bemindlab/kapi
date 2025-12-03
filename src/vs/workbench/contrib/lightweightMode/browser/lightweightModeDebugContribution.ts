@@ -33,6 +33,9 @@ export class LightweightModeDebugContribution extends Disposable implements IWor
 				this.restoreDebugSettings();
 			}
 		}));
+
+		// Note: Debug contribution doesn't currently use configuration service
+		// as it doesn't have any configurable hiding behavior yet
 	}
 
 	private applyDebugSettings(): void {

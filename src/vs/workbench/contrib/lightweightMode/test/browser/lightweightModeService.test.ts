@@ -20,7 +20,7 @@ suite('LightweightModeService', () => {
 
 	setup(() => {
 		configurationService = new TestConfigurationService();
-		storageService = new TestStorageService();
+		storageService = disposables.add(new TestStorageService());
 		service = disposables.add(new LightweightModeService(configurationService, storageService));
 	});
 

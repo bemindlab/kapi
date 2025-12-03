@@ -34,6 +34,14 @@ export class LightweightModeEditorContribution extends Disposable implements IWo
 				this.restoreEditorSettings();
 			}
 		}));
+
+		// Listen for configuration changes while mode is active
+		this._register(this.configurationService.onDidChangeConfiguration(e => {
+			if (this.lightweightModeService.isEnabled() &&
+				e.affectsConfiguration('workbench.lightweightMode')) {
+				this.applyEditorSettings();
+			}
+		}));
 	}
 
 	private applyEditorSettings(): void {

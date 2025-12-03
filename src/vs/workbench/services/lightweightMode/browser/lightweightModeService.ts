@@ -9,6 +9,7 @@ import { ILightweightModeService, ILightweightModeConfiguration, ILightweightMod
 import { IConfigurationService } from '../../../../platform/configuration/common/configuration.js';
 import { IStorageService, StorageScope, StorageTarget } from '../../../../platform/storage/common/storage.js';
 import { Parts } from '../../layout/browser/layoutService.js';
+import { LightweightModeStateManager } from '../../../contrib/lightweightMode/browser/lightweightModeStateManager.js';
 
 const LIGHTWEIGHT_MODE_ENABLED_KEY = 'workbench.lightweightMode.enabled';
 
@@ -21,12 +22,17 @@ export class LightweightModeService extends Disposable implements ILightweightMo
 
 	private _isEnabled: boolean = false;
 	private _cachedConfiguration: ILightweightModeConfiguration | undefined;
+	private readonly stateManager: LightweightModeStateManager;
 
 	constructor(
 		@IConfigurationService private readonly configurationService: IConfigurationService,
 		@IStorageService private readonly storageService: IStorageService
 	) {
 		super();
+
+		// Initialize state manager
+		this.stateManager = this._register(new LightweightModeStateManager(this.storageService));
+		this.stateManager.loadState();
 
 		// Load initial state from storage (persists across sessions) or fall back to configuration
 		const storedValue = this.storageService.get(LIGHTWEIGHT_MODE_ENABLED_KEY, StorageScope.PROFILE);

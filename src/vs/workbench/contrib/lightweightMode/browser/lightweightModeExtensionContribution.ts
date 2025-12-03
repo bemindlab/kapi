@@ -33,6 +33,14 @@ export class LightweightModeExtensionContribution extends Disposable implements 
 				this.restoreExtensionSettings();
 			}
 		}));
+
+		// Listen for configuration changes while mode is active
+		this._register(this.configurationService.onDidChangeConfiguration(e => {
+			if (this.lightweightModeService.isEnabled() &&
+				e.affectsConfiguration('workbench.lightweightMode')) {
+				this.applyExtensionSettings();
+			}
+		}));
 	}
 
 	private applyExtensionSettings(): void {

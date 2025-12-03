@@ -21,7 +21,7 @@ suite('LightweightMode - Zen Mode Integration', () => {
 
 	test('should maintain state when toggled independently', async () => {
 		const configurationService = new TestConfigurationService();
-		const storageService = new TestStorageService();
+		const storageService = disposables.add(new TestStorageService());
 		const service = disposables.add(new LightweightModeService(configurationService, storageService));
 
 		// Enable lightweight mode
@@ -40,7 +40,7 @@ suite('LightweightMode - Zen Mode Integration', () => {
 
 	test('should not interfere with zen mode part visibility', async () => {
 		const configurationService = new TestConfigurationService();
-		const storageService = new TestStorageService();
+		const storageService = disposables.add(new TestStorageService());
 		const service = disposables.add(new LightweightModeService(configurationService, storageService));
 
 		// Enable lightweight mode
@@ -57,7 +57,7 @@ suite('LightweightMode - Zen Mode Integration', () => {
 
 	test('should handle rapid mode toggles without conflicts', async () => {
 		const configurationService = new TestConfigurationService();
-		const storageService = new TestStorageService();
+		const storageService = disposables.add(new TestStorageService());
 		const service = disposables.add(new LightweightModeService(configurationService, storageService));
 
 		// Rapid toggles
@@ -76,7 +76,7 @@ suite('LightweightMode - Zen Mode Integration', () => {
 
 	test('should preserve configuration across mode changes', async () => {
 		const configurationService = new TestConfigurationService();
-		const storageService = new TestStorageService();
+		const storageService = disposables.add(new TestStorageService());
 		const service = disposables.add(new LightweightModeService(configurationService, storageService));
 
 		// Set custom configuration

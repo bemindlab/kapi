@@ -36,12 +36,13 @@ suite('LightweightModeLayoutContribution', () => {
 	let layoutService: MockLayoutService;
 	setup(() => {
 		configurationService = new TestConfigurationService();
-		storageService = new TestStorageService();
+		storageService = disposables.add(new TestStorageService());
 		lightweightModeService = disposables.add(new LightweightModeService(configurationService, storageService));
 		layoutService = new MockLayoutService();
 		disposables.add(new LightweightModeLayoutContribution(
 			lightweightModeService,
-			layoutService as any
+			layoutService as any,
+			configurationService
 		));
 	});
 

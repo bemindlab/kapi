@@ -115,8 +115,15 @@ export class LightweightModeStateManager extends Disposable {
 	}
 
 	loadState(): void {
-		// For now, don't load state from storage to avoid JSON.parse
-		// State will be rebuilt on each session
-		// This can be enhanced later with a custom parser if needed
+		const serialized = this.storageService.get(LightweightModeStateManager.STORAGE_KEY, StorageScope.PROFILE);
+		if (serialized) {
+			try {
+				// Use JSON.parse - it's safe in this context (we control the data format)
+				this.currentState = JSON.parse(serialized);
+			} catch (e) {
+				// Invalid state, start fresh
+				this.clearState();
+			}
+		}
 	}
 }

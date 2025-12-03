@@ -33,6 +33,14 @@ export class LightweightModeScmContribution extends Disposable implements IWorkb
 				this.restoreScmSettings();
 			}
 		}));
+
+		// Listen for configuration changes while mode is active
+		this._register(this.configurationService.onDidChangeConfiguration(e => {
+			if (this.lightweightModeService.isEnabled() &&
+				e.affectsConfiguration('workbench.lightweightMode')) {
+				this.applyScmSettings();
+			}
+		}));
 	}
 
 	private applyScmSettings(): void {
