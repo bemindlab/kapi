@@ -76,35 +76,35 @@ export class LightweightModeService extends Disposable implements ILightweightMo
 
 	// Convenience accessors for individual configuration values (performance optimization)
 	get hideActivityBar(): boolean {
-		return this._isEnabled && (this._cache.hideActivityBar ?? this.readAndCache('hideActivityBar', true));
+		return this._cache.hideActivityBar ?? this.readAndCache('hideActivityBar', true);
 	}
 
 	get hideStatusBar(): boolean {
-		return this._isEnabled && (this._cache.hideStatusBar ?? this.readAndCache('hideStatusBar', false));
+		return this._cache.hideStatusBar ?? this.readAndCache('hideStatusBar', false);
 	}
 
 	get hideMinimap(): boolean {
-		return this._isEnabled && (this._cache.hideMinimap ?? this.readAndCache('hideMinimap', true));
+		return this._cache.hideMinimap ?? this.readAndCache('hideMinimap', true);
 	}
 
 	get hideBreadcrumbs(): boolean {
-		return this._isEnabled && (this._cache.hideBreadcrumbs ?? this.readAndCache('hideBreadcrumbs', true));
+		return this._cache.hideBreadcrumbs ?? this.readAndCache('hideBreadcrumbs', true);
 	}
 
 	get hideGitDecorations(): boolean {
-		return this._isEnabled && (this._cache.hideGitDecorations ?? this.readAndCache('hideGitDecorations', true));
+		return this._cache.hideGitDecorations ?? this.readAndCache('hideGitDecorations', true);
 	}
 
 	get hideExtensionRecommendations(): boolean {
-		return this._isEnabled && (this._cache.hideExtensionRecommendations ?? this.readAndCache('hideExtensionRecommendations', true));
+		return this._cache.hideExtensionRecommendations ?? this.readAndCache('hideExtensionRecommendations', true);
 	}
 
 	get simplifyMenus(): boolean {
-		return this._isEnabled && (this._cache.simplifyMenus ?? this.readAndCache('simplifyMenus', true));
+		return this._cache.simplifyMenus ?? this.readAndCache('simplifyMenus', false);
 	}
 
 	get simplifyContextMenus(): boolean {
-		return this._isEnabled && (this._cache.simplifyContextMenus ?? this.readAndCache('simplifyContextMenus', true));
+		return this._cache.simplifyContextMenus ?? this.readAndCache('simplifyContextMenus', false);
 	}
 
 	async toggle() {
@@ -126,8 +126,8 @@ export class LightweightModeService extends Disposable implements ILightweightMo
 			hideBreadcrumbs: this._cache.hideBreadcrumbs ?? this.readAndCache('hideBreadcrumbs', true),
 			hideGitDecorations: this._cache.hideGitDecorations ?? this.readAndCache('hideGitDecorations', true),
 			hideExtensionRecommendations: this._cache.hideExtensionRecommendations ?? this.readAndCache('hideExtensionRecommendations', true),
-			simplifyMenus: this._cache.simplifyMenus ?? this.readAndCache('simplifyMenus', true),
-			simplifyContextMenus: this._cache.simplifyContextMenus ?? this.readAndCache('simplifyContextMenus', true),
+			simplifyMenus: this._cache.simplifyMenus ?? this.readAndCache('simplifyMenus', false),
+			simplifyContextMenus: this._cache.simplifyContextMenus ?? this.readAndCache('simplifyContextMenus', false),
 			customizations: this._cache.customizations ?? this.readAndCacheCustomizations()
 		};
 	}

@@ -63,9 +63,10 @@ export class TestConfigurationService implements IConfigurationService {
 		// Fire configuration change event
 		this.onDidChangeConfigurationEmitter.fire({
 			affectsConfiguration: (configuration: string, overrides?: IConfigurationOverrides): boolean => {
-				// Check if this configuration key or any parent key changed
+				// Check if any changed key matches or is a child of the configuration being checked
 				for (const changedKey of changedKeys) {
-					if (configuration === changedKey || configuration.startsWith(changedKey + '.')) {
+					// Exact match or changedKey is a child of configuration
+					if (changedKey === configuration || changedKey.startsWith(configuration + '.')) {
 						return true;
 					}
 				}
