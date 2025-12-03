@@ -8,6 +8,7 @@ import { ensureNoDisposablesAreLeakedInTestSuite } from '../../../../../base/tes
 import { LightweightModeService } from '../../browser/lightweightModeService.js';
 import { TestConfigurationService } from '../../../../test/browser/workbenchTestServices.js';
 import { TestStorageService } from '../../../../test/common/workbenchTestServices.js';
+import { NullTelemetryService } from '../../../../../platform/telemetry/common/telemetryUtils.js';
 
 /**
  * Integration tests for Lightweight Mode and Zen Mode coexistence
@@ -22,7 +23,7 @@ suite('LightweightMode - Zen Mode Integration', () => {
 	test('should maintain state when toggled independently', async () => {
 		const configurationService = new TestConfigurationService();
 		const storageService = disposables.add(new TestStorageService());
-		const service = disposables.add(new LightweightModeService(configurationService, storageService));
+		const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 		// Enable lightweight mode
 		await service.toggle();
@@ -41,7 +42,7 @@ suite('LightweightMode - Zen Mode Integration', () => {
 	test('should not interfere with zen mode part visibility', async () => {
 		const configurationService = new TestConfigurationService();
 		const storageService = disposables.add(new TestStorageService());
-		const service = disposables.add(new LightweightModeService(configurationService, storageService));
+		const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 		// Enable lightweight mode
 		await service.toggle();
@@ -58,7 +59,7 @@ suite('LightweightMode - Zen Mode Integration', () => {
 	test('should handle rapid mode toggles without conflicts', async () => {
 		const configurationService = new TestConfigurationService();
 		const storageService = disposables.add(new TestStorageService());
-		const service = disposables.add(new LightweightModeService(configurationService, storageService));
+		const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 		// Rapid toggles
 		await service.toggle(); // Enable
@@ -77,7 +78,7 @@ suite('LightweightMode - Zen Mode Integration', () => {
 	test('should preserve configuration across mode changes', async () => {
 		const configurationService = new TestConfigurationService();
 		const storageService = disposables.add(new TestStorageService());
-		const service = disposables.add(new LightweightModeService(configurationService, storageService));
+		const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 		// Set custom configuration
 		await configurationService.setUserConfiguration('workbench.lightweightMode.hideActivityBar', false);

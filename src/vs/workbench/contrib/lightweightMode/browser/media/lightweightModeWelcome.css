@@ -1,0 +1,218 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/* Minimal Welcome Screen for Lightweight Mode */
+
+.lightweight-welcome-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--vscode-editor-background);
+	z-index: 1000;
+	animation: fadeIn 300ms ease-out;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.lightweight-welcome-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 40px;
+	max-width: 600px;
+	padding: 40px;
+}
+
+.lightweight-welcome-header {
+	text-align: center;
+}
+
+.lightweight-welcome-title {
+	font-size: 32px;
+	font-weight: 300;
+	margin: 0 0 12px 0;
+	color: var(--vscode-foreground);
+	letter-spacing: -0.5px;
+}
+
+.lightweight-welcome-subtitle {
+	font-size: 14px;
+	margin: 0;
+	color: var(--vscode-descriptionForeground);
+	font-weight: 400;
+}
+
+.lightweight-welcome-actions {
+	display: flex;
+	gap: 16px;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+.lightweight-welcome-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 24px;
+	font-size: 14px;
+	font-family: inherit;
+	font-weight: 500;
+	border: 1px solid var(--vscode-button-border, transparent);
+	border-radius: 4px;
+	cursor: pointer;
+	transition: all 150ms ease;
+	outline: none;
+}
+
+.lightweight-welcome-btn.primary {
+	background: var(--vscode-button-background);
+	color: var(--vscode-button-foreground);
+}
+
+.lightweight-welcome-btn.primary:hover {
+	background: var(--vscode-button-hoverBackground);
+	transform: translateY(-1px);
+}
+
+.lightweight-welcome-btn.primary:active {
+	transform: translateY(0);
+}
+
+.lightweight-welcome-btn .codicon {
+	font-size: 16px;
+}
+
+.lightweight-welcome-btn.secondary {
+	background: var(--vscode-button-secondaryBackground);
+	color: var(--vscode-button-secondaryForeground);
+}
+
+.lightweight-welcome-btn.secondary:hover {
+	background: var(--vscode-button-secondaryHoverBackground);
+	transform: translateY(-1px);
+}
+
+.lightweight-welcome-secondary-actions {
+	display: flex;
+	gap: 12px;
+	flex-wrap: wrap;
+	justify-content: center;
+	margin-top: 16px;
+}
+
+.lightweight-welcome-btn-small {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 16px;
+	font-size: 12px;
+	font-family: inherit;
+	font-weight: 400;
+	background: transparent;
+	color: var(--vscode-foreground);
+	border: 1px solid var(--vscode-input-border, rgba(128, 128, 128, 0.2));
+	border-radius: 4px;
+	cursor: pointer;
+	transition: all 150ms ease;
+	outline: none;
+}
+
+.lightweight-welcome-btn-small:hover {
+	background: var(--vscode-list-hoverBackground);
+	border-color: var(--vscode-focusBorder);
+}
+
+.lightweight-welcome-btn-small .codicon {
+	font-size: 14px;
+}
+
+.lightweight-welcome-footer {
+	margin-top: 32px;
+}
+
+.lightweight-welcome-shortcuts {
+	display: flex;
+	gap: 24px;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+.lightweight-welcome-shortcut {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	font-size: 11px;
+	color: var(--vscode-descriptionForeground);
+	text-align: center;
+}
+
+.lightweight-welcome-shortcut kbd {
+	display: inline-block;
+	padding: 4px 8px;
+	font-family: inherit;
+	font-size: 11px;
+	line-height: 1.4;
+	color: var(--vscode-foreground);
+	background: var(--vscode-input-background);
+	border: 1px solid var(--vscode-input-border, rgba(128, 128, 128, 0.2));
+	border-radius: 3px;
+	box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+	min-width: 60px;
+}
+
+/* Hide standard welcome page when in lightweight mode */
+body.lightweight-mode-welcome .part.editor {
+	/* We'll show our overlay instead */
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+	.lightweight-welcome-container {
+		padding: 20px;
+		gap: 30px;
+	}
+
+	.lightweight-welcome-title {
+		font-size: 24px;
+	}
+
+	.lightweight-welcome-actions {
+		flex-direction: column;
+		width: 100%;
+	}
+
+	.lightweight-welcome-btn {
+		width: 100%;
+		justify-content: center;
+	}
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+	.lightweight-welcome-overlay {
+		animation: none;
+	}
+
+	.lightweight-welcome-btn:hover {
+		transform: none;
+	}
+
+	.lightweight-welcome-btn:active {
+		transform: none;
+	}
+}

@@ -10,6 +10,7 @@ import { LightweightModeService } from '../../browser/lightweightModeService.js'
 import { TestConfigurationService } from '../../../../test/browser/workbenchTestServices.js';
 import { TestStorageService } from '../../../../test/common/workbenchTestServices.js';
 import { Parts } from '../../../../services/layout/browser/layoutService.js';
+import { NullTelemetryService } from '../../../../../platform/telemetry/common/telemetryUtils.js';
 class MockLayoutService {
 	private hiddenParts: { [key: string]: boolean } = {};
 
@@ -19,6 +20,11 @@ class MockLayoutService {
 
 	setPartHidden(hidden: boolean, part: Parts): void {
 		this.hiddenParts[part] = hidden;
+	}
+
+	getContainer(window: Window, part: Parts): HTMLElement | undefined {
+		// Return undefined - animation controller will fall back to immediate mode
+		return undefined;
 	}
 
 	getHiddenParts(): { [key: string]: boolean } {
@@ -37,7 +43,7 @@ suite('LightweightModeLayoutContribution', () => {
 	setup(() => {
 		configurationService = new TestConfigurationService();
 		storageService = disposables.add(new TestStorageService());
-		lightweightModeService = disposables.add(new LightweightModeService(configurationService, storageService));
+		lightweightModeService = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 		layoutService = new MockLayoutService();
 		disposables.add(new LightweightModeLayoutContribution(
 			lightweightModeService,
@@ -53,10 +59,10 @@ suite('LightweightModeLayoutContribution', () => {
 	});
 
 	test('should hide activity bar when mode is enabled', async () => {
-		await configurationService.setUserConfiguration('workbench.lightweightMode.enabled', true);
+		// Configure to hide activity bar
 		await configurationService.setUserConfiguration('workbench.lightweightMode.hideActivityBar', true);
 
-		// Trigger mode change
+		// Enable mode
 		await lightweightModeService.toggle();
 
 		const hiddenParts = layoutService.getHiddenParts();
@@ -64,9 +70,10 @@ suite('LightweightModeLayoutContribution', () => {
 	});
 
 	test('should hide status bar when configured', async () => {
-		await configurationService.setUserConfiguration('workbench.lightweightMode.enabled', true);
+		// Configure to hide status bar
 		await configurationService.setUserConfiguration('workbench.lightweightMode.hideStatusBar', true);
 
+		// Enable mode
 		await lightweightModeService.toggle();
 
 		const hiddenParts = layoutService.getHiddenParts();
@@ -74,9 +81,10 @@ suite('LightweightModeLayoutContribution', () => {
 	});
 
 	test('should restore parts when mode is disabled', async () => {
-		// Enable mode
-		await configurationService.setUserConfiguration('workbench.lightweightMode.enabled', true);
+		// Configure to hide activity bar
 		await configurationService.setUserConfiguration('workbench.lightweightMode.hideActivityBar', true);
+
+		// Enable mode
 		await lightweightModeService.toggle();
 
 		// Verify hidden

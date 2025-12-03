@@ -181,7 +181,10 @@ registerSingleton(IAllowedMcpServersService, AllowedMcpServersService, Instantia
 // Lightweight Mode
 import { ILightweightModeService } from './services/lightweightMode/common/lightweightMode.js';
 import { LightweightModeService } from './services/lightweightMode/browser/lightweightModeService.js';
+import { ILightweightModeProfileService } from './services/lightweightMode/common/lightweightModeProfiles.js';
+import { LightweightModeProfileService } from './services/lightweightMode/browser/lightweightModeProfileService.js';
 registerSingleton(ILightweightModeService, LightweightModeService, InstantiationType.Delayed);
+registerSingleton(ILightweightModeProfileService, LightweightModeProfileService, InstantiationType.Delayed);
 
 //#endregion
 

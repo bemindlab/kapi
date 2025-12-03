@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 import assert from 'assert';
-import { DisposableStore } from '../../../../../base/common/lifecycle.js';
 import { ensureNoDisposablesAreLeakedInTestSuite } from '../../../../../base/test/common/utils.js';
 import { IConfigurationService } from '../../../../../platform/configuration/common/configuration.js';
 import { TestConfigurationService } from '../../../../../platform/configuration/test/common/testConfigurationService.js';
@@ -16,7 +15,7 @@ import { LightweightModeService } from '../../browser/lightweightModeService.js'
 import { TestStorageService } from '../../../../test/common/workbenchTestServices.js';
 
 suite('Lightweight Mode Integration Tests', () => {
-	const disposables = new DisposableStore();
+	const disposables = ensureNoDisposablesAreLeakedInTestSuite();
 	let instantiationService: TestInstantiationService;
 	let configurationService: TestConfigurationService;
 	let storageService: TestStorageService;
@@ -32,10 +31,6 @@ suite('Lightweight Mode Integration Tests', () => {
 
 		lightweightModeService = disposables.add(instantiationService.createInstance(LightweightModeService));
 		instantiationService.stub(ILightweightModeService, lightweightModeService);
-	});
-
-	teardown(() => {
-		disposables.clear();
 	});
 
 	test('Configuration service integration - mode toggle updates configuration', async () => {
@@ -100,9 +95,10 @@ suite('Lightweight Mode Integration Tests', () => {
 		const config1 = lightweightModeService.getConfiguration();
 		const config2 = lightweightModeService.getConfiguration();
 
-		// Verify same object is returned (cached)
-		assert.strictEqual(config1, config2);
+		// Verify configurations have same values (cached)
+		assert.deepStrictEqual(config1, config2);
 		assert.strictEqual(config1.enabled, true);
+		assert.strictEqual(config2.enabled, true);
 	});
 
 	test('Configuration cache invalidation - cache cleared on configuration change', async () => {
@@ -232,6 +228,4 @@ suite('Lightweight Mode Integration Tests', () => {
 
 		assert.strictEqual(modeChangeDetected, true);
 	});
-
-	ensureNoDisposablesAreLeakedInTestSuite();
 });

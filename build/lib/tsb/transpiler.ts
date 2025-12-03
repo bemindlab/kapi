@@ -22,6 +22,9 @@ interface TranspileRes {
 
 function transpile(tsSrc: string, options: ts.TranspileOptions): { jsSrc: string; diag: ts.Diagnostic[] } {
 
+	// Filter out CSS imports before transpilation
+	tsSrc = tsSrc.replace(/^import\s+['"][^'"]*\.css['"];?\s*$/gm, '');
+
 	const isAmd = /\n(import|export)/m.test(tsSrc);
 	if (!isAmd && options.compilerOptions?.module === ts.ModuleKind.AMD) {
 		// enforce NONE module-system for not-amd cases
@@ -360,7 +363,12 @@ export class ESBuildTranspiler implements ITranspiler {
 			throw Error('file.contents must be a Buffer');
 		}
 		const t1 = Date.now();
-		this._jobs.push(esbuild.transform(file.contents, {
+
+		// Remove CSS imports from the file contents before transpilation
+		let contents = file.contents.toString('utf8');
+		contents = contents.replace(/^import\s+['"][^'"]*\.css['"];?\s*$/gm, '');
+
+		this._jobs.push(esbuild.transform(Buffer.from(contents), {
 			...this._transformOpts,
 			sourcefile: file.path,
 		}).then(result => {

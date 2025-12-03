@@ -1,0 +1,36 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/* Lightweight Mode Animations
+ * Uses GPU-accelerated properties (opacity, transform) for smooth performance
+ * Respects prefers-reduced-motion media query via JavaScript controller
+ */
+
+.lightweight-mode-transition {
+	/* GPU-accelerated properties only for best performance */
+	transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1), transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+	/* cubic-bezier for smooth ease-in-out animation */
+}
+
+.lightweight-mode-hiding {
+	/* Fade out and slightly slide up when hiding */
+	opacity: 0;
+	transform: translateY(-4px);
+	/* Small vertical movement creates polished effect */
+}
+
+/* Optional: Smooth transitions for showing parts (fade in from hidden state) */
+.lightweight-mode-transition:not(.lightweight-mode-hiding) {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* Respect user's motion preferences at OS/browser level */
+@media (prefers-reduced-motion: reduce) {
+	.lightweight-mode-transition {
+		/* Disable transitions for users who prefer reduced motion */
+		transition: none !important;
+	}
+}

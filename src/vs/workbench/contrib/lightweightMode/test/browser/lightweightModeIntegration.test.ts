@@ -9,6 +9,7 @@ import { LightweightModeService } from '../../browser/lightweightModeService.js'
 import { TestConfigurationService } from '../../../../test/browser/workbenchTestServices.js';
 import { TestStorageService } from '../../../../test/common/workbenchTestServices.js';
 import { Parts } from '../../../../services/layout/browser/layoutService.js';
+import { NullTelemetryService } from '../../../../../platform/telemetry/common/telemetryUtils.js';
 
 /**
  * Integration tests for Lightweight Mode
@@ -24,8 +25,8 @@ suite('LightweightMode - Integration Tests', () => {
 
 		test('should correctly determine which parts to hide', async () => {
 			const configurationService = new TestConfigurationService();
-			const storageService = new TestStorageService();
-			const service = disposables.add(new LightweightModeService(configurationService, storageService));
+			const storageService = disposables.add(new TestStorageService());
+			const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 			// Initially disabled, no parts should be hidden
 			assert.strictEqual(service.shouldHidePart(Parts.ACTIVITYBAR_PART), false);
@@ -42,8 +43,8 @@ suite('LightweightMode - Integration Tests', () => {
 
 		test('should respect custom part visibility configuration', async () => {
 			const configurationService = new TestConfigurationService();
-			const storageService = new TestStorageService();
-			const service = disposables.add(new LightweightModeService(configurationService, storageService));
+			const storageService = disposables.add(new TestStorageService());
+			const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 			// Configure to hide status bar but not activity bar
 			await configurationService.setUserConfiguration('workbench.lightweightMode.hideActivityBar', false);
@@ -59,8 +60,8 @@ suite('LightweightMode - Integration Tests', () => {
 
 		test('should not hide essential parts', async () => {
 			const configurationService = new TestConfigurationService();
-			const storageService = new TestStorageService();
-			const service = disposables.add(new LightweightModeService(configurationService, storageService));
+			const storageService = disposables.add(new TestStorageService());
+			const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 			await service.toggle();
 
@@ -75,8 +76,8 @@ suite('LightweightMode - Integration Tests', () => {
 
 		test('should load configuration on startup', () => {
 			const configurationService = new TestConfigurationService();
-			const storageService = new TestStorageService();
-			const service = disposables.add(new LightweightModeService(configurationService, storageService));
+			const storageService = disposables.add(new TestStorageService());
+			const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 			const config = service.getConfiguration();
 
@@ -90,8 +91,8 @@ suite('LightweightMode - Integration Tests', () => {
 
 		test('should react to configuration changes', async () => {
 			const configurationService = new TestConfigurationService();
-			const storageService = new TestStorageService();
-			const service = disposables.add(new LightweightModeService(configurationService, storageService));
+			const storageService = disposables.add(new TestStorageService());
+			const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 			let eventFired = false;
 			disposables.add(service.onDidChangeLightweightMode(() => {
@@ -108,8 +109,8 @@ suite('LightweightMode - Integration Tests', () => {
 
 		test('should persist configuration changes', async () => {
 			const configurationService = new TestConfigurationService();
-			const storageService = new TestStorageService();
-			const service = disposables.add(new LightweightModeService(configurationService, storageService));
+			const storageService = disposables.add(new TestStorageService());
+			const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 			// Set custom configuration
 			await configurationService.setUserConfiguration('workbench.lightweightMode.hideActivityBar', false);
@@ -126,8 +127,8 @@ suite('LightweightMode - Integration Tests', () => {
 
 		test('should handle invalid configuration gracefully', async () => {
 			const configurationService = new TestConfigurationService();
-			const storageService = new TestStorageService();
-			const service = disposables.add(new LightweightModeService(configurationService, storageService));
+			const storageService = disposables.add(new TestStorageService());
+			const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 			// Set invalid configuration (should fall back to defaults)
 			await configurationService.setUserConfiguration('workbench.lightweightMode.hideActivityBar', undefined);
@@ -144,22 +145,22 @@ suite('LightweightMode - Integration Tests', () => {
 
 		test('should persist mode state across sessions', async () => {
 			const configurationService = new TestConfigurationService();
-			const storageService = new TestStorageService();
+			const storageService = disposables.add(new TestStorageService());
 
 			// First session: enable mode
-			const service1 = disposables.add(new LightweightModeService(configurationService, storageService));
+			const service1 = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 			await service1.toggle();
 			assert.strictEqual(service1.isEnabled(), true);
 
 			// Second session: mode should still be enabled
-			const service2 = disposables.add(new LightweightModeService(configurationService, storageService));
+			const service2 = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 			assert.strictEqual(service2.isEnabled(), true);
 		});
 
 		test('should sync state between storage and configuration', async () => {
 			const configurationService = new TestConfigurationService();
-			const storageService = new TestStorageService();
-			const service = disposables.add(new LightweightModeService(configurationService, storageService));
+			const storageService = disposables.add(new TestStorageService());
+			const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 			// Toggle via service
 			await service.toggle();
@@ -177,8 +178,8 @@ suite('LightweightMode - Integration Tests', () => {
 
 		test('should provide configuration for extension filtering', async () => {
 			const configurationService = new TestConfigurationService();
-			const storageService = new TestStorageService();
-			const service = disposables.add(new LightweightModeService(configurationService, storageService));
+			const storageService = disposables.add(new TestStorageService());
+			const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 			await service.toggle();
 
@@ -190,8 +191,8 @@ suite('LightweightMode - Integration Tests', () => {
 
 		test('should allow customization of extension UI filtering', async () => {
 			const configurationService = new TestConfigurationService();
-			const storageService = new TestStorageService();
-			const service = disposables.add(new LightweightModeService(configurationService, storageService));
+			const storageService = disposables.add(new TestStorageService());
+			const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 			// Configure to show extension recommendations
 			await configurationService.setUserConfiguration('workbench.lightweightMode.hideExtensionRecommendations', false);
@@ -207,8 +208,8 @@ suite('LightweightMode - Integration Tests', () => {
 
 		test('should fire events on mode changes', async () => {
 			const configurationService = new TestConfigurationService();
-			const storageService = new TestStorageService();
-			const service = disposables.add(new LightweightModeService(configurationService, storageService));
+			const storageService = disposables.add(new TestStorageService());
+			const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 			let eventCount = 0;
 			let lastEventValue: boolean | undefined;
@@ -231,8 +232,8 @@ suite('LightweightMode - Integration Tests', () => {
 
 		test('should fire events on configuration changes', async () => {
 			const configurationService = new TestConfigurationService();
-			const storageService = new TestStorageService();
-			const service = disposables.add(new LightweightModeService(configurationService, storageService));
+			const storageService = disposables.add(new TestStorageService());
+			const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 			let eventFired = false;
 
@@ -251,8 +252,8 @@ suite('LightweightMode - Integration Tests', () => {
 
 		test('should handle complete workflow: enable, configure, disable', async () => {
 			const configurationService = new TestConfigurationService();
-			const storageService = new TestStorageService();
-			const service = disposables.add(new LightweightModeService(configurationService, storageService));
+			const storageService = disposables.add(new TestStorageService());
+			const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 			// Step 1: Enable mode
 			await service.toggle();
@@ -280,8 +281,8 @@ suite('LightweightMode - Integration Tests', () => {
 
 		test('should handle rapid toggles without data loss', async () => {
 			const configurationService = new TestConfigurationService();
-			const storageService = new TestStorageService();
-			const service = disposables.add(new LightweightModeService(configurationService, storageService));
+			const storageService = disposables.add(new TestStorageService());
+			const service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 
 			// Set custom configuration
 			await configurationService.setUserConfiguration('workbench.lightweightMode.hideActivityBar', false);

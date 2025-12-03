@@ -1,0 +1,11 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#1e1e1e"/>
+  <text x="200" y="150" font-family="Arial" font-size="24" fill="#ffffff" text-anchor="middle">
+    Lightweight Mode
+  </text>
+  <text x="200" y="180" font-family="Arial" font-size="14" fill="#cccccc" text-anchor="middle">
+    Simplified UI for focused coding
+  </text>
+  <circle cx="50" cy="50" r="20" fill="#007acc" opacity="0.5"/>
+  <circle cx="350" cy="250" r="30" fill="#007acc" opacity="0.5"/>
+</svg>

@@ -43,6 +43,7 @@ export class TestConfigurationService implements IConfigurationService {
 	}
 
 	public updateValue(key: string, value: unknown): Promise<void> {
+		this.configuration[key] = value;
 		return Promise.resolve(undefined);
 	}
 

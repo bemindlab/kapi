@@ -161,6 +161,37 @@ KAPI AI Agents reuses the VS Code architecture while layering in the agent orche
 
 We now provide `make dev` to run the lightweight development loop: it rebuilds native addons (e.g., `@vscode/policy-watcher`), starts `pnpm run watch-client`, ensures the Electron runtime is ready via `pnpm run gulp electron`, and finally launches `./scripts/code.sh`, keeping the watcher alive until you close the app. This mirrors the upstream VS Code flow while adding the agent-oriented flavor of KAPI.
 
+## Branding
+
+### The Capybara Icon Philosophy
+
+KAPI AI Agents features a distinctive **capybara-themed app icon** that embodies our core development philosophy. The capybara was chosen as our iconic symbol for several meaningful reasons:
+
+**🦫 Why the Capybara?**
+
+* **Collaborative Spirit** - Capybaras are known for living harmoniously with diverse species, mirroring how our AI agents work alongside developers and integrate with any tech stack
+* **Calm Under Pressure** - These gentle creatures remain composed in complex environments, just as KAPI maintains stability when handling intricate codebases and demanding tasks
+* **Intelligent Adaptation** - Capybaras thrive in varied ecosystems by being highly adaptable, reflecting our AI's ability to understand different languages, frameworks, and project contexts
+* **Natural Facilitators** - Often called "nature's chair" for other animals, capybaras enable others to succeed—much like how KAPI enables developers to achieve their goals faster
+* **Community-Oriented** - Capybaras are social and communicative, representing our multi-agent collaboration system where specialized agents work together seamlessly
+
+The capybara icon isn't just branding—it's a reminder that great software development happens when intelligent systems work in harmony with human creativity.
+
+### Icon Assets
+
+The app icons are located in:
+* **macOS**: `resources/darwin/code.icns`
+* **Windows**: `resources/win32/code.ico`
+* **Linux**: `resources/linux/code.png`
+
+To regenerate icons from source, use the provided scripts:
+```bash
+bash generate_icons.sh  # Generate icon files from source image
+bash replace_icons.sh   # Replace platform icons with generated ones
+```
+
+Original icons are backed up in `resources/backup_icons/` before replacement.
+
 ## License
 
 Based on Visual Studio Code - Open Source ("Code - OSS")

@@ -1,0 +1,11 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#1e1e1e"/>
+  <text x="200" y="150" font-family="Arial" font-size="20" fill="#ffffff" text-anchor="middle">
+    Get Help
+  </text>
+  <text x="200" y="180" font-family="Arial" font-size="14" fill="#cccccc" text-anchor="middle">
+    Access settings, shortcuts, and documentation
+  </text>
+  <circle cx="200" cy="230" r="30" stroke="#007acc" stroke-width="3" fill="none"/>
+  <text x="200" y="240" font-family="Arial" font-size="32" fill="#007acc" text-anchor="middle">?</text>
+</svg>

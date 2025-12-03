@@ -9,6 +9,7 @@ import { LightweightModeService } from '../../browser/lightweightModeService.js'
 import { TestConfigurationService } from '../../../../test/browser/workbenchTestServices.js';
 import { TestStorageService } from '../../../../test/common/workbenchTestServices.js';
 import { Parts } from '../../../../services/layout/browser/layoutService.js';
+import { NullTelemetryService } from '../../../../../platform/telemetry/common/telemetryUtils.js';
 
 suite('LightweightModeService', () => {
 
@@ -21,7 +22,7 @@ suite('LightweightModeService', () => {
 	setup(() => {
 		configurationService = new TestConfigurationService();
 		storageService = disposables.add(new TestStorageService());
-		service = disposables.add(new LightweightModeService(configurationService, storageService));
+		service = disposables.add(new LightweightModeService(configurationService, storageService, NullTelemetryService));
 	});
 
 	test('should start disabled by default', () => {

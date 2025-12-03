@@ -9,6 +9,9 @@ import { Parts } from '../../layout/browser/layoutService.js';
 
 export const ILightweightModeService = createDecorator<ILightweightModeService>('lightweightModeService');
 
+export type ActivityBarBehavior = 'hidden' | 'visible' | 'auto';
+export type StatusBarMode = 'hidden' | 'visible' | 'minimal';
+
 export interface ILightweightModeConfiguration {
 	enabled: boolean;
 	hideActivityBar: boolean;
@@ -20,6 +23,11 @@ export interface ILightweightModeConfiguration {
 	simplifyMenus: boolean;
 	simplifyContextMenus: boolean;
 	customizations: ILightweightModeCustomizations;
+	// Advanced options
+	activityBarBehavior?: ActivityBarBehavior;
+	statusBarMode?: StatusBarMode;
+	editorFocusMode?: boolean;
+	menuFavorites?: string[];
 }
 
 export interface ILightweightModeCustomizations {
@@ -43,8 +51,9 @@ export interface ILightweightModeService {
 
 	/**
 	 * Toggles lightweight mode on or off.
+	 * @param from Optional string indicating how the toggle was initiated (for telemetry)
 	 */
-	toggle(): Promise<void>;
+	toggle(from?: string): Promise<void>;
 
 	/**
 	 * Gets the current lightweight mode configuration.
@@ -73,4 +82,12 @@ export interface ILightweightModeService {
 	readonly hideExtensionRecommendations: boolean;
 	readonly simplifyMenus: boolean;
 	readonly simplifyContextMenus: boolean;
+
+	/**
+	 * Advanced configuration accessors.
+	 */
+	readonly activityBarBehavior: ActivityBarBehavior;
+	readonly statusBarMode: StatusBarMode;
+	readonly editorFocusMode: boolean;
+	readonly menuFavorites: string[];
 }

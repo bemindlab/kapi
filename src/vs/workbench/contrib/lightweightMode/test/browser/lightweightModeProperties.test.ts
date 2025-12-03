@@ -9,6 +9,7 @@ import { LightweightModeService } from '../../browser/lightweightModeService.js'
 import { TestConfigurationService } from '../../../../test/browser/workbenchTestServices.js';
 import { TestStorageService } from '../../../../test/common/workbenchTestServices.js';
 import { StorageScope, StorageTarget } from '../../../../../platform/storage/common/storage.js';
+import { NullTelemetryService } from '../../../../../platform/telemetry/common/telemetryUtils.js';
 
 /**
  * Property-based tests for Lightweight Mode
@@ -38,7 +39,7 @@ suite('LightweightMode - Property Tests', () => {
 			storageService.store('workbench.lightweightMode.enabled', 'true', StorageScope.PROFILE, StorageTarget.USER);
 
 			// Create service - it should load the enabled state from storage
-			const service = new LightweightModeService(configurationService, storageService);
+			const service = new LightweightModeService(configurationService, storageService, NullTelemetryService);
 			assert.strictEqual(service.isEnabled(), true, `Iteration ${i}: Mode should be loaded from storage`);
 
 			// Clean up
@@ -60,7 +61,7 @@ suite('LightweightMode - Property Tests', () => {
 		for (let i = 0; i < iterations; i++) {
 			const configurationService = new TestConfigurationService();
 			const storageService = new TestStorageService();
-			const service = new LightweightModeService(configurationService, storageService);
+			const service = new LightweightModeService(configurationService, storageService, NullTelemetryService);
 
 			let eventFired = false;
 			const listener = service.onDidChangeLightweightMode(() => {
@@ -100,7 +101,7 @@ suite('LightweightMode - Property Tests', () => {
 		for (let i = 0; i < iterations; i++) {
 			const configurationService = new TestConfigurationService();
 			const storageService = new TestStorageService();
-			const service = new LightweightModeService(configurationService, storageService);
+			const service = new LightweightModeService(configurationService, storageService, NullTelemetryService);
 
 			// Test each setting
 			for (const setting of settingsToTest) {
@@ -137,9 +138,9 @@ suite('LightweightMode - Property Tests', () => {
 		for (let i = 0; i < iterations; i++) {
 			const configurationService = new TestConfigurationService();
 			const storageService = new TestStorageService();
-			const service = new LightweightModeService(configurationService, storageService);
+			const service = new LightweightModeService(configurationService, storageService, NullTelemetryService);
 
-			await configurationService.setUserConfiguration('workbench.lightweightMode.enabled', true);
+			// Enable lightweight mode
 			await service.toggle();
 
 			const config = service.getConfiguration();
@@ -173,7 +174,7 @@ suite('LightweightMode - Property Tests', () => {
 		for (let i = 0; i < iterations; i++) {
 			const configurationService = new TestConfigurationService();
 			const storageService = new TestStorageService();
-			const service = new LightweightModeService(configurationService, storageService);
+			const service = new LightweightModeService(configurationService, storageService, NullTelemetryService);
 
 			// Record initial state
 			const initialEnabled = service.isEnabled();
@@ -206,7 +207,7 @@ suite('LightweightMode - Property Tests', () => {
 		for (let i = 0; i < iterations; i++) {
 			const configurationService = new TestConfigurationService();
 			const storageService = new TestStorageService();
-			const service = new LightweightModeService(configurationService, storageService);
+			const service = new LightweightModeService(configurationService, storageService, NullTelemetryService);
 
 			// Generate random configuration for which elements to hide
 			const hideActivityBar = Math.random() > 0.5;
@@ -257,7 +258,7 @@ suite('LightweightMode - Property Tests', () => {
 		for (let i = 0; i < iterations; i++) {
 			const configurationService = new TestConfigurationService();
 			const storageService = new TestStorageService();
-			const service = new LightweightModeService(configurationService, storageService);
+			const service = new LightweightModeService(configurationService, storageService, NullTelemetryService);
 
 			// Randomly decide whether to explicitly enable breadcrumbs
 			const explicitlyEnableBreadcrumbs = Math.random() > 0.5;
@@ -303,7 +304,7 @@ suite('LightweightMode - Property Tests', () => {
 		for (let i = 0; i < iterations; i++) {
 			const configurationService = new TestConfigurationService();
 			const storageService = new TestStorageService();
-			const service = new LightweightModeService(configurationService, storageService);
+			const service = new LightweightModeService(configurationService, storageService, NullTelemetryService);
 
 			// Configure extension UI hiding
 			const hideExtensionRecommendations = Math.random() > 0.5;
@@ -360,7 +361,7 @@ suite('LightweightMode - Property Tests', () => {
 		for (let i = 0; i < iterations; i++) {
 			const configurationService = new TestConfigurationService();
 			const storageService = new TestStorageService();
-			const service = new LightweightModeService(configurationService, storageService);
+			const service = new LightweightModeService(configurationService, storageService, NullTelemetryService);
 
 			// Randomly enable/disable menu simplification
 			const simplifyMenus = Math.random() > 0.5;
@@ -404,7 +405,7 @@ suite('LightweightMode - Property Tests', () => {
 		for (let i = 0; i < iterations; i++) {
 			const configurationService = new TestConfigurationService();
 			const storageService = new TestStorageService();
-			const service = new LightweightModeService(configurationService, storageService);
+			const service = new LightweightModeService(configurationService, storageService, NullTelemetryService);
 
 			// Simulate a context menu with random number of items (5-20)
 			const normalModeItemCount = Math.floor(Math.random() * 16) + 5;

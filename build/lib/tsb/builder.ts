@@ -152,9 +152,15 @@ export function createTypeScriptBuilder(config: IConfiguration, projectFile: str
 							}
 						}
 
+						// Filter out CSS imports from JavaScript output
+						let fileText = file.text;
+						if (/\.js$/.test(file.name)) {
+							fileText = fileText.replace(/^import\s+['"][^'"]*\.css['"];?\s*$/gm, '');
+						}
+
 						const vinyl = new Vinyl({
 							path: file.name,
-							contents: Buffer.from(file.text),
+							contents: Buffer.from(fileText),
 							base: !config._emitWithoutBasePath && baseFor(host.getScriptSnapshot(fileName)) || undefined
 						});
 

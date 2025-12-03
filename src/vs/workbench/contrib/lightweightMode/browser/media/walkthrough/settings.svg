@@ -1,0 +1,12 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#1e1e1e"/>
+  <text x="200" y="150" font-family="Arial" font-size="20" fill="#ffffff" text-anchor="middle">
+    Customize Settings
+  </text>
+  <text x="200" y="180" font-family="Arial" font-size="14" fill="#cccccc" text-anchor="middle">
+    Control what's hidden in Lightweight Mode
+  </text>
+  <rect x="100" y="200" width="200" height="20" fill="#333333" rx="3"/>
+  <rect x="100" y="225" width="200" height="20" fill="#333333" rx="3"/>
+  <rect x="100" y="250" width="200" height="20" fill="#333333" rx="3"/>
+</svg>

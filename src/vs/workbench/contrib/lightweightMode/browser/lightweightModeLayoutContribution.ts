@@ -8,12 +8,14 @@ import { IWorkbenchContribution } from '../../../common/contributions.js';
 import { ILightweightModeService } from '../../../services/lightweightMode/common/lightweightMode.js';
 import { IWorkbenchLayoutService, Parts } from '../../../services/layout/browser/layoutService.js';
 import { IConfigurationService } from '../../../../platform/configuration/common/configuration.js';
+import { LightweightModeAnimationController } from './lightweightModeAnimations.js';
 
 export class LightweightModeLayoutContribution extends Disposable implements IWorkbenchContribution {
 
 	static readonly ID = 'workbench.contrib.lightweightModeLayout';
 
 	private previousPartVisibility: { [key: string]: boolean } = {};
+	private animationController: LightweightModeAnimationController;
 
 	constructor(
 		@ILightweightModeService private readonly lightweightModeService: ILightweightModeService,
@@ -21,6 +23,9 @@ export class LightweightModeLayoutContribution extends Disposable implements IWo
 		@IConfigurationService private readonly configurationService: IConfigurationService
 	) {
 		super();
+
+		// Initialize animation controller
+		this.animationController = this._register(new LightweightModeAnimationController(this.layoutService));
 
 		// Apply initial state
 		if (this.lightweightModeService.isEnabled()) {
@@ -47,34 +52,50 @@ export class LightweightModeLayoutContribution extends Disposable implements IWo
 		}));
 	}
 
-	private applyLightweightMode(): void {
+	private async applyLightweightMode(): Promise<void> {
 		// Store current visibility state before hiding
 		this.previousPartVisibility = {};
+
+		// Collect parts to animate
+		const partsToHide: Parts[] = [];
 
 		// Hide activity bar if configured (using centralized accessor)
 		if (this.lightweightModeService.hideActivityBar) {
 			const isVisible = this.layoutService.isVisible(Parts.ACTIVITYBAR_PART);
 			this.previousPartVisibility[Parts.ACTIVITYBAR_PART] = isVisible;
 			if (isVisible) {
-				this.layoutService.setPartHidden(true, Parts.ACTIVITYBAR_PART);
+				partsToHide.push(Parts.ACTIVITYBAR_PART);
 			}
 		}
 
 		// Hide status bar if configured (using centralized accessor)
 		if (this.lightweightModeService.hideStatusBar) {
 			this.previousPartVisibility[Parts.STATUSBAR_PART] = true;
-			this.layoutService.setPartHidden(true, Parts.STATUSBAR_PART);
+			partsToHide.push(Parts.STATUSBAR_PART);
 		}
+
+		// Animate all parts concurrently
+		await Promise.all(partsToHide.map(part =>
+			this.animationController.animatePartVisibility(part, true)
+		));
 	}
 
-	private restoreNormalMode(): void {
+	private async restoreNormalMode(): Promise<void> {
+		// Collect parts to restore
+		const partsToShow: Parts[] = [];
+
 		// Restore previously hidden parts
 		if (this.previousPartVisibility[Parts.ACTIVITYBAR_PART]) {
-			this.layoutService.setPartHidden(false, Parts.ACTIVITYBAR_PART);
+			partsToShow.push(Parts.ACTIVITYBAR_PART);
 		}
 		if (this.previousPartVisibility[Parts.STATUSBAR_PART]) {
-			this.layoutService.setPartHidden(false, Parts.STATUSBAR_PART);
+			partsToShow.push(Parts.STATUSBAR_PART);
 		}
+
+		// Animate all parts concurrently
+		await Promise.all(partsToShow.map(part =>
+			this.animationController.animatePartVisibility(part, false)
+		));
 
 		this.previousPartVisibility = {};
 	}
