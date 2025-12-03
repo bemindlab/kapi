@@ -21,8 +21,20 @@ export class LightweightModeService extends Disposable implements ILightweightMo
 	readonly onDidChangeLightweightMode: Event<boolean> = this._onDidChangeLightweightMode.event;
 
 	private _isEnabled: boolean = false;
-	private _cachedConfiguration: ILightweightModeConfiguration | undefined;
 	private readonly stateManager: LightweightModeStateManager;
+
+	// Granular caching for better performance
+	private _cache = {
+		hideActivityBar: undefined as boolean | undefined,
+		hideStatusBar: undefined as boolean | undefined,
+		hideMinimap: undefined as boolean | undefined,
+		hideBreadcrumbs: undefined as boolean | undefined,
+		hideGitDecorations: undefined as boolean | undefined,
+		hideExtensionRecommendations: undefined as boolean | undefined,
+		simplifyMenus: undefined as boolean | undefined,
+		simplifyContextMenus: undefined as boolean | undefined,
+		customizations: undefined as ILightweightModeCustomizations | undefined
+	};
 
 	constructor(
 		@IConfigurationService private readonly configurationService: IConfigurationService,
@@ -45,8 +57,8 @@ export class LightweightModeService extends Disposable implements ILightweightMo
 		// Listen for configuration changes
 		this._register(this.configurationService.onDidChangeConfiguration(e => {
 			if (e.affectsConfiguration('workbench.lightweightMode')) {
-				// Invalidate cache when configuration changes
-				this._cachedConfiguration = undefined;
+				// Granular cache invalidation - only invalidate what changed
+				this.invalidateCache(e.affectedKeys);
 
 				const newEnabled = this.configurationService.getValue<boolean>('workbench.lightweightMode.enabled') ?? false;
 				if (newEnabled !== this._isEnabled) {
@@ -62,10 +74,41 @@ export class LightweightModeService extends Disposable implements ILightweightMo
 		return this._isEnabled;
 	}
 
+	// Convenience accessors for individual configuration values (performance optimization)
+	get hideActivityBar(): boolean {
+		return this._isEnabled && (this._cache.hideActivityBar ?? this.readAndCache('hideActivityBar', true));
+	}
+
+	get hideStatusBar(): boolean {
+		return this._isEnabled && (this._cache.hideStatusBar ?? this.readAndCache('hideStatusBar', false));
+	}
+
+	get hideMinimap(): boolean {
+		return this._isEnabled && (this._cache.hideMinimap ?? this.readAndCache('hideMinimap', true));
+	}
+
+	get hideBreadcrumbs(): boolean {
+		return this._isEnabled && (this._cache.hideBreadcrumbs ?? this.readAndCache('hideBreadcrumbs', true));
+	}
+
+	get hideGitDecorations(): boolean {
+		return this._isEnabled && (this._cache.hideGitDecorations ?? this.readAndCache('hideGitDecorations', true));
+	}
+
+	get hideExtensionRecommendations(): boolean {
+		return this._isEnabled && (this._cache.hideExtensionRecommendations ?? this.readAndCache('hideExtensionRecommendations', true));
+	}
+
+	get simplifyMenus(): boolean {
+		return this._isEnabled && (this._cache.simplifyMenus ?? this.readAndCache('simplifyMenus', true));
+	}
+
+	get simplifyContextMenus(): boolean {
+		return this._isEnabled && (this._cache.simplifyContextMenus ?? this.readAndCache('simplifyContextMenus', true));
+	}
+
 	async toggle() {
 		const newValue = !this._isEnabled;
-		// Invalidate cache before toggling
-		this._cachedConfiguration = undefined;
 
 		await this.configurationService.updateValue('workbench.lightweightMode.enabled', newValue);
 		this._isEnabled = newValue;
@@ -74,35 +117,46 @@ export class LightweightModeService extends Disposable implements ILightweightMo
 	}
 
 	getConfiguration(): ILightweightModeConfiguration {
-		// Return cached configuration if available (performance optimization)
-		if (this._cachedConfiguration) {
-			return this._cachedConfiguration;
-		}
+		// Build configuration from granular caches (only reading uncached values)
+		return {
+			enabled: this._isEnabled,
+			hideActivityBar: this._cache.hideActivityBar ?? this.readAndCache('hideActivityBar', true),
+			hideStatusBar: this._cache.hideStatusBar ?? this.readAndCache('hideStatusBar', false),
+			hideMinimap: this._cache.hideMinimap ?? this.readAndCache('hideMinimap', true),
+			hideBreadcrumbs: this._cache.hideBreadcrumbs ?? this.readAndCache('hideBreadcrumbs', true),
+			hideGitDecorations: this._cache.hideGitDecorations ?? this.readAndCache('hideGitDecorations', true),
+			hideExtensionRecommendations: this._cache.hideExtensionRecommendations ?? this.readAndCache('hideExtensionRecommendations', true),
+			simplifyMenus: this._cache.simplifyMenus ?? this.readAndCache('simplifyMenus', true),
+			simplifyContextMenus: this._cache.simplifyContextMenus ?? this.readAndCache('simplifyContextMenus', true),
+			customizations: this._cache.customizations ?? this.readAndCacheCustomizations()
+		};
+	}
 
-		// Lazy evaluation: only read configuration when needed
-		const config = this.configurationService.getValue<ILightweightModeConfiguration>('workbench.lightweightMode');
+	private readAndCache<K extends keyof typeof this._cache>(key: K, defaultValue: any): any {
+		const value = this.configurationService.getValue<any>(`workbench.lightweightMode.${key}`) ?? defaultValue;
+		this._cache[key] = value as any;
+		return value;
+	}
 
+	private readAndCacheCustomizations(): ILightweightModeCustomizations {
 		const defaultCustomizations: ILightweightModeCustomizations = {
 			hiddenParts: [],
 			hiddenMenuItems: [],
 			hiddenContextMenuItems: []
 		};
+		const value = this.configurationService.getValue<ILightweightModeCustomizations>('workbench.lightweightMode.customizations') ?? defaultCustomizations;
+		this._cache.customizations = value;
+		return value;
+	}
 
-		// Cache the configuration to avoid repeated lookups
-		this._cachedConfiguration = {
-			enabled: this._isEnabled,
-			hideActivityBar: config?.hideActivityBar ?? true,
-			hideStatusBar: config?.hideStatusBar ?? false,
-			hideMinimap: config?.hideMinimap ?? true,
-			hideBreadcrumbs: config?.hideBreadcrumbs ?? true,
-			hideGitDecorations: config?.hideGitDecorations ?? true,
-			hideExtensionRecommendations: config?.hideExtensionRecommendations ?? true,
-			simplifyMenus: config?.simplifyMenus ?? true,
-			simplifyContextMenus: config?.simplifyContextMenus ?? true,
-			customizations: config?.customizations ?? defaultCustomizations
-		};
-
-		return this._cachedConfiguration;
+	private invalidateCache(affectedKeys: ReadonlySet<string>): void {
+		// Only invalidate cache entries for keys that changed
+		for (const key of affectedKeys) {
+			const configKey = key.replace('workbench.lightweightMode.', '');
+			if (configKey in this._cache) {
+				(this._cache as any)[configKey] = undefined;
+			}
+		}
 	}
 
 	shouldHidePart(part: Parts): boolean {

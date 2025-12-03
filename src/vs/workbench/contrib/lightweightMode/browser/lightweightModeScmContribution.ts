@@ -44,10 +44,8 @@ export class LightweightModeScmContribution extends Disposable implements IWorkb
 	}
 
 	private applyScmSettings(): void {
-		const config = this.lightweightModeService.getConfiguration();
-
-		// Hide git decorations if configured
-		if (config.hideGitDecorations) {
+		// Hide git decorations if configured (using centralized accessor)
+		if (this.lightweightModeService.hideGitDecorations) {
 			this.previousGitDecorationsEnabled = this.configurationService.getValue<boolean>('git.decorations.enabled');
 			if (this.previousGitDecorationsEnabled !== false) {
 				this.configurationService.updateValue('git.decorations.enabled', false);

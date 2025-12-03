@@ -60,4 +60,17 @@ export interface ILightweightModeService {
 	 * Determines if a specific menu item should be hidden in lightweight mode.
 	 */
 	shouldHideMenuItem(menuId: string, itemId: string): boolean;
+
+	/**
+	 * Convenience accessors for individual configuration values.
+	 * These are more efficient than calling getConfiguration() for each value.
+	 */
+	readonly hideActivityBar: boolean;
+	readonly hideStatusBar: boolean;
+	readonly hideMinimap: boolean;
+	readonly hideBreadcrumbs: boolean;
+	readonly hideGitDecorations: boolean;
+	readonly hideExtensionRecommendations: boolean;
+	readonly simplifyMenus: boolean;
+	readonly simplifyContextMenus: boolean;
 }

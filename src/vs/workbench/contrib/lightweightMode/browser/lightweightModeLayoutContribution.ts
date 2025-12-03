@@ -48,13 +48,11 @@ export class LightweightModeLayoutContribution extends Disposable implements IWo
 	}
 
 	private applyLightweightMode(): void {
-		const config = this.lightweightModeService.getConfiguration();
-
 		// Store current visibility state before hiding
 		this.previousPartVisibility = {};
 
-		// Hide activity bar if configured
-		if (config.hideActivityBar) {
+		// Hide activity bar if configured (using centralized accessor)
+		if (this.lightweightModeService.hideActivityBar) {
 			const isVisible = this.layoutService.isVisible(Parts.ACTIVITYBAR_PART);
 			this.previousPartVisibility[Parts.ACTIVITYBAR_PART] = isVisible;
 			if (isVisible) {
@@ -62,8 +60,8 @@ export class LightweightModeLayoutContribution extends Disposable implements IWo
 			}
 		}
 
-		// Hide status bar if configured
-		if (config.hideStatusBar) {
+		// Hide status bar if configured (using centralized accessor)
+		if (this.lightweightModeService.hideStatusBar) {
 			this.previousPartVisibility[Parts.STATUSBAR_PART] = true;
 			this.layoutService.setPartHidden(true, Parts.STATUSBAR_PART);
 		}

@@ -45,18 +45,16 @@ export class LightweightModeEditorContribution extends Disposable implements IWo
 	}
 
 	private applyEditorSettings(): void {
-		const config = this.lightweightModeService.getConfiguration();
-
-		// Hide minimap if configured
-		if (config.hideMinimap) {
+		// Hide minimap if configured (using centralized accessor)
+		if (this.lightweightModeService.hideMinimap) {
 			this.previousMinimapEnabled = this.configurationService.getValue<boolean>('editor.minimap.enabled');
 			if (this.previousMinimapEnabled !== false) {
 				this.configurationService.updateValue('editor.minimap.enabled', false);
 			}
 		}
 
-		// Hide breadcrumbs if configured
-		if (config.hideBreadcrumbs) {
+		// Hide breadcrumbs if configured (using centralized accessor)
+		if (this.lightweightModeService.hideBreadcrumbs) {
 			this.previousBreadcrumbsEnabled = this.configurationService.getValue<boolean>('breadcrumbs.enabled');
 			if (this.previousBreadcrumbsEnabled !== false) {
 				this.configurationService.updateValue('breadcrumbs.enabled', false);

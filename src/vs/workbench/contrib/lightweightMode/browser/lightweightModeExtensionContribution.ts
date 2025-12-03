@@ -44,10 +44,8 @@ export class LightweightModeExtensionContribution extends Disposable implements 
 	}
 
 	private applyExtensionSettings(): void {
-		const config = this.lightweightModeService.getConfiguration();
-
-		// Hide extension recommendations if configured
-		if (config.hideExtensionRecommendations) {
+		// Hide extension recommendations if configured (using centralized accessor)
+		if (this.lightweightModeService.hideExtensionRecommendations) {
 			this.previousExtensionRecommendationsEnabled = this.configurationService.getValue<boolean>('extensions.ignoreRecommendations');
 			// Set to true to ignore/hide recommendations
 			if (this.previousExtensionRecommendationsEnabled !== true) {
